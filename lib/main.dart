@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'setup.dart';
+import 'modeSelect.dart';
 
 void main() => runApp(new MyApp());
 
@@ -46,7 +46,10 @@ class _HomePageState extends State<HomePage> {
             'You have pushed the button this many times:',
             style: Theme.of(context).textTheme.display1,
           ),*/
-          customButton("Start")
+          customButton("Continue Game"),
+          customButton("Start"),
+          customButton("Tutorial"),
+          customButton("Add Level")
         ],
       ),
     );
@@ -54,7 +57,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget customButton(String text) {
     return new MaterialButton(
-      onPressed: _pushGame,
+      onPressed: _pushModeSelect,
       height: 70.0,
       minWidth: double.infinity,
       color: Theme.of(context).primaryColor,
@@ -64,11 +67,11 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _pushGame() {
+  void _pushModeSelect() {
     Navigator.of(context).push(
       new MaterialPageRoute(
         builder: (context) {
-          return new SetupPage(title: "Hello");
+          return new ModeSelectPage(title: "Hello");
         }
       )
     );

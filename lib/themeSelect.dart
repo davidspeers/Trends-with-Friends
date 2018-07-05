@@ -6,16 +6,18 @@ import 'dart:async';
 
 import 'query.dart';
 
-class SetupPage extends StatefulWidget {
-  SetupPage({Key key, this.title}) : super(key: key);
+class ThemeSelectPage extends StatefulWidget {
+  ThemeSelectPage({Key key, this.title, this.alertChoice, this.mode}) : super(key: key);
 
   final String title;
+  final dynamic alertChoice;
+  final String mode;
 
   @override
-  _SetupPageState createState() => new _SetupPageState();
+  _ThemeSelectPageState createState() => new _ThemeSelectPageState();
 }
 
-class _SetupPageState extends State<SetupPage> {
+class _ThemeSelectPageState extends State<ThemeSelectPage> {
   List<String> modes = ["Random", "TV", "Movies", "Politics", "Harry Potter", "Future", "Muppets", "Animals"];
   //add const to the map if you find out a way to take random out of the map
   var themesMap = {
@@ -27,11 +29,11 @@ class _SetupPageState extends State<SetupPage> {
 
   @override
   Widget build(BuildContext context) {
-    return _setupPageUI();
+    return _themeSelectPageUI();
   }
 
-  Widget _setupPageUI() {
-    final title = 'Grid List';
+  Widget _themeSelectPageUI() {
+    final title = widget.mode;
     topics = _allTopics(themesMap);
 
     return new Scaffold(
@@ -49,7 +51,7 @@ class _SetupPageState extends State<SetupPage> {
                 if (index == 0) {
                   getRandomWords();
                 }
-                _pushGame(index);
+                _pushGame(index, widget.mode, widget.alertChoice);
               },
               child: new Text(
                 '${topics[index]}',
@@ -85,11 +87,11 @@ class _SetupPageState extends State<SetupPage> {
     return await rootBundle.loadString(path);
   }
 
-  void _pushGame(int index) {
+  void _pushGame(int index, String mode, var alertChoice) {
     Navigator.of(context).push(
         new MaterialPageRoute(
             builder: (context) {
-              return new QueryPage(title: topics[index], terms: themesMap[topics[index]]);
+              return new QueryPage(title: topics[index], terms: themesMap[topics[index]], mode: mode, alertChoice: alertChoice,);
             }
         )
     );

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'main.dart';
 import 'result.dart';
 
 import 'customWidgets.dart';
@@ -10,10 +9,12 @@ import 'dart:async';
 
 
 class QueryPage extends StatefulWidget {
-  QueryPage({Key key, this.title, this.terms}) : super(key: key);
+  QueryPage({Key key, this.title, this.terms, this.mode, this.alertChoice}) : super(key: key);
 
   final String title;
   final List<String> terms;
+  final String mode;
+  final dynamic alertChoice;
 
   @override
   _QueryPageState createState() => new _QueryPageState();
@@ -22,6 +23,7 @@ class QueryPage extends StatefulWidget {
 class _QueryPageState extends State<QueryPage> {
   //Text Controller Retrieves the current value
   final myController = new TextEditingController();
+  final List<Color> bgColors = [Colors.blueAccent[200], Colors.redAccent[200], Colors.yellowAccent[200], Colors.greenAccent[200], Colors.purpleAccent[200]];
   var bgColor = Colors.blueAccent[200];
   var teamNum = 1;
   var queries = {}; // This is a Map
@@ -42,6 +44,37 @@ class _QueryPageState extends State<QueryPage> {
   }
 
   Widget _queryPageUI() {
+    List<Widget> children = [
+      new Text(
+      "Match 1 word with:\n${widget.terms[termIndex]}",
+      style: whiteTextSmall,
+      ),
+      new TextField(
+        controller: myController,
+        autofocus: true,
+        decoration: new InputDecoration(
+          fillColor: Colors.yellow,
+          filled: true,
+          contentPadding: new EdgeInsets.fromLTRB(
+            10.0, 30.0, 10.0, 10.0
+          ),
+          border: new OutlineInputBorder(
+            borderRadius: new BorderRadius.circular(12.0),
+          ),
+          hintText: 'Please Enter Term'
+        )
+      )
+    ];
+    if (widget.mode == "Party Mode") {
+      children.insert(
+        0,
+        new Text(
+          "Team $teamNum",
+          style: whiteText
+        )
+      );
+    }
+
     return Scaffold(
       appBar: new AppBar(
         leading: homeIcon(context),
@@ -51,31 +84,7 @@ class _QueryPageState extends State<QueryPage> {
           padding: const EdgeInsets.all(16.0),
           child: new Column(
             crossAxisAlignment: CrossAxisAlignment.start,//align left
-            children: <Widget>[
-              new Text(
-                  "Team $teamNum",
-                  style: whiteText
-              ),
-              new Text(
-                "Match 1 word with:\n${widget.terms[termIndex]}",
-                style: whiteTextSmall,
-              ),
-              new TextField(
-                controller: myController,
-                autofocus: true,
-                decoration: new InputDecoration(
-                  fillColor: Colors.yellow,
-                  filled: true,
-                  contentPadding: new EdgeInsets.fromLTRB(
-                      10.0, 30.0, 10.0, 10.0
-                  ),
-                  border: new OutlineInputBorder(
-                    borderRadius: new BorderRadius.circular(12.0),
-                  ),
-                  hintText: 'Please Enter Term'
-                ),
-              ),
-            ],
+            children: children
           )
       ),
       backgroundColor: bgColor,
@@ -85,28 +94,47 @@ class _QueryPageState extends State<QueryPage> {
         // The async and await stuff is there so that the widget doesn't update
         // until the widget is popped back. There may be a better way of doing this.
         onPressed: () async {
-          queries[teamNum] = myController.text + " " + widget.terms[termIndex];
-          if (teamNum < 2) {
-            setState(() {
-              bgColor = Colors.redAccent[200];
-              teamNum++;
-              myController.text = "";
-            });
-          } else {
-            // List<int> scores returned from results.dart
-            if (termIndex < widget.terms.length-1) {
-              List<int> scores = await _pushResults(false);
-              setState(() {
-                bgColor = Colors.blueAccent[200];
-                teamNum--;
+          switch (widget.mode) {
+            case ("Party Mode"): {
+              queries[teamNum] = myController.text + " " + widget.terms[termIndex];
+              if (teamNum < widget.alertChoice) {
+                setState(() {
+                  bgColor = bgColors[teamNum];
+                  teamNum++;
+                  myController.text = "";
+                });
+              } else {
+                // List<int> scores returned from results.dart
+                if (termIndex < widget.terms.length-1) {
+                  List<int> scores = await _pushResults(false);
+                  setState(() {
+                    bgColor = bgColors[0];
+                    teamNum = 1;
+                    myController.text = "";
+                    termIndex++;
+                  });
+                  results = addLists(results, scores);
+                } else {
+                  _pushResults(true);
+                }
+              }
+              break;
+            }
+
+            case ("CPU Mode"): {
+              queries["User Answer"] = myController.text + " " + widget.terms[termIndex];
+              if (termIndex < widget.terms.length-1) {
+                List<int> scores = await _pushResults(false);
                 myController.text = "";
                 termIndex++;
-              });
-              results = addLists(results, scores);
-            } else {
-              _pushResults(true);
+                results = addLists(results, scores);
+              } else {
+                _pushResults(true);
+              }
+              break;
             }
           }
+
         },
         tooltip: 'Show me the value!',
         child: new Icon(Icons.send),
@@ -115,11 +143,14 @@ class _QueryPageState extends State<QueryPage> {
   }
 
   Future _pushResults(bool lastQuery) {
+    //Converts map to List
+    List<String> queriesList = new List<String>.from(queries.values.toList());
     return Navigator.of(context).push(
       new MaterialPageRoute(
         builder: (context) {
           return new ResultsPage(
-            title: "Hello", queries: [queries[1], queries[2]], lastQuery: lastQuery, previousResults: results);
+            title: "Hello", queries: queriesList, lastQuery: lastQuery, previousResults: results, term: widget.terms[termIndex], mode: widget.mode, alertChoice: widget.alertChoice
+          );
         }
       )
     );

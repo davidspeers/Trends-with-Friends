@@ -4,10 +4,11 @@ import 'customWidgets.dart';
 import 'fontStyles.dart';
 
 class FinalScorePage extends StatefulWidget {
-  FinalScorePage({Key key, this.title, this.scores}) : super(key: key);
+  FinalScorePage({Key key, this.title, this.scores, this.mode}) : super(key: key);
 
   final String title;
   final List<int> scores;
+  final String mode;
 
   @override
   _FinalScorePageState createState() => new _FinalScorePageState();
@@ -51,12 +52,28 @@ class _FinalScorePageState extends State<FinalScorePage> {
   String getWinners(List<int> scores) {
     List<int> winningIndex = getWinnersIndex(scores);
     String winners = "";
-    if (winningIndex.length>1) winners = "Winners:";
-    else winners = "Winner:";
-    for (int index in winningIndex) {
-      winners = winners + "\nTeam ${index+1}";
+    switch (widget.mode) {
+      case ("Party Mode"): {
+        if (winningIndex.length>1) winners = "Winners:";
+        else winners = "Winner:";
+        for (int index in winningIndex) {
+          winners = winners + "\nTeam ${index+1}";
+        }
+        break;
+      }
+
+      case ("CPU Mode"): {
+        if (winningIndex.length>1) winners = "You Drew The Computer";
+        else {
+          if (winningIndex[0]==0) winners = "Congratulations, You Beat The Goog";
+          else winners = "You Lost To The Goog\nTry Again";
+        }
+        break;
+      }
+
+      return winners;
     }
-    return winners;
+
   }
 
   //Return all the indexes of the highest scores

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'themeSelect.dart';
+import 'storyMode.dart';
 
 import 'dart:async';
 
@@ -60,9 +61,15 @@ class _ModeSelectPageState extends State<ModeSelectPage> {
             break;
           }
 
+          case "Story Mode": {
+            print("Hello");
+            _pushStorySelect();
+            break;
+          }
+
           default: {
             //_neverSatisfied();
-            print("Nothing");
+            print("Nothing Happened - Check Mode Selection Button");
             //do Nothing
             break;
           }
@@ -102,6 +109,7 @@ class _ModeSelectPageState extends State<ModeSelectPage> {
                 content: verticalLayout(buttons)
             );
           }
+
         }
 
       },
@@ -130,12 +138,22 @@ class _ModeSelectPageState extends State<ModeSelectPage> {
 
 
   void _pushThemeSelect(var alertChoice, String mode) {
+      Navigator.of(context).push(
+          new MaterialPageRoute(
+              builder: (context) {
+                return new ThemeSelectPage(title: "Hello", alertChoice: alertChoice, mode: mode);
+              }
+          )
+      );
+  }
+
+  void _pushStorySelect() {
     Navigator.of(context).push(
-      new MaterialPageRoute(
-        builder: (context) {
-          return new ThemeSelectPage(title: "Hello", alertChoice: alertChoice, mode: mode);
-        }
-      )
+        new MaterialPageRoute(
+            builder: (context) {
+              return new StoryModePage(title: "Hello",);
+            }
+        )
     );
   }
 }

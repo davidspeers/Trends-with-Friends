@@ -4,14 +4,19 @@ import 'package:csv/csv.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'dart:async';
 
+import 'package:web_socket_channel/io.dart';
+import 'multiplayerMode.dart';
+
 import 'query.dart';
 
 class ThemeSelectPage extends StatefulWidget {
-  ThemeSelectPage({Key key, this.title, this.alertChoice, this.mode}) : super(key: key);
+  ThemeSelectPage({Key key, this.title, this.alertChoice, this.mode, this.teamName, this.roomName}) : super(key: key);
 
   final String title;
   final dynamic alertChoice;
   final String mode;
+  final String teamName;
+  final String roomName;
 
   @override
   _ThemeSelectPageState createState() => new _ThemeSelectPageState();
@@ -88,13 +93,25 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
   }
 
   void _pushGame(int index, String mode, var alertChoice) {
-    Navigator.of(context).push(
-        new MaterialPageRoute(
-            builder: (context) {
-              return new QueryPage(title: topics[index], terms: themesMap[topics[index]], mode: mode, alertChoice: alertChoice,);
-            }
-        )
-    );
+    if (widget.mode == "Multiplayer Mode") {
+      Navigator.of(context).push(
+          new MaterialPageRoute(
+              builder: (context) {
+                return new MyHomePage(title: "Hello",
+                    channel: IOWebSocketChannel.connect(
+                        'ws://trends-test-app.herokuapp.com'));
+              }
+          )
+      );
+    } else {
+      Navigator.of(context).push(
+          new MaterialPageRoute(
+              builder: (context) {
+                return new QueryPage(title: topics[index], terms: themesMap[topics[index]], mode: mode, alertChoice: alertChoice,);
+              }
+          )
+      );
+    }
   }
 
   List<String> _allTopics(Map map) {

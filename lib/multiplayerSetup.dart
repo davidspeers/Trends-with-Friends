@@ -103,8 +103,8 @@ class _MultiplayerPageState extends State<MultiplayerPage> {
                 return new MyHomePage(
                   title: "Hello",
                   channel: IOWebSocketChannel.connect(
-                        'ws://trends-app-server.herokuapp.com'),
-                  roomName: roomName,
+                    ('ws://trends-app-server.herokuapp.com/' + roomName)
+                  ),
                   teamName: teamName
                 );
               }

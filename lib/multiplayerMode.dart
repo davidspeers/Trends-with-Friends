@@ -4,12 +4,11 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import 'dart:convert';
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, @required this.title, @required this.channel, @required this.teamName, @required this.roomName}) : super(key: key);
+  MyHomePage({Key key, @required this.title, @required this.channel, @required this.teamName}) : super(key: key);
 
   final String title;
   final WebSocketChannel channel;
   final String teamName;
-  final String roomName;
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -60,7 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
       //widget.channel.sink.add(_controller.text + widget.roomName + widget.teamName);
       print("Message Sent");
       widget.channel.sink.add(
-          json.encode({'Query': _controller.text, 'teamName': widget.teamName, 'roomName': widget.roomName})
+          json.encode({'Query': _controller.text, 'teamName': widget.teamName})
       );
     }
   }

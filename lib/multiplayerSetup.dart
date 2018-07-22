@@ -61,7 +61,7 @@ class _MultiplayerPageState extends State<MultiplayerPage> {
               border: new OutlineInputBorder(
                 borderRadius: new BorderRadius.circular(12.0),
               ),
-              hintText: 'Please Enter Room Name'
+              hintText: 'Please Enter Team Name'
           )
       )
     ];
@@ -86,7 +86,7 @@ class _MultiplayerPageState extends State<MultiplayerPage> {
     );
   }
 
-  void _pushThemeSelect(var alertChoice, String mode, String teamName, String roomName) {
+  void _pushThemeSelect(var alertChoice, String mode, String roomName, String teamName) {
     if (widget.alertChoice == "Host Game") {
       Navigator.of(context).push(
           new MaterialPageRoute(

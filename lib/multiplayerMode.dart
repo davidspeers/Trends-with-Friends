@@ -59,7 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
       //widget.channel.sink.add(_controller.text + widget.roomName + widget.teamName);
       print("Message Sent");
       widget.channel.sink.add(
-          json.encode({'Query': _controller.text, 'teamName': widget.teamName})
+          json.encode({'query': _controller.text, 'teamName': widget.teamName})
       );
     }
   }

@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:csv/csv.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'dart:async';
-
-import 'package:web_socket_channel/io.dart';
-import 'multiplayerMode.dart';
 
 import 'query.dart';
 
@@ -70,48 +66,32 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
 
   void getRandomWords() async {
     String data = await getFileData('csv/word-freq-top4999.csv');
-    List<List<dynamic>> rowsAsListOfValues = const CsvToListConverter().convert(data);
-    List<List<dynamic>> randomWords = (rowsAsListOfValues..shuffle()).sublist(0,4);
-    List<String> rndWords = convertCSV(randomWords);
-    print(rndWords);
-    themesMap['Random'] = rndWords;
+    List<String> rowsAsList = data.split("\n");
+    List<String> randomWords = capitaliseList((rowsAsList..shuffle()).sublist(0, 4));
+    themesMap['Random'] = randomWords;
   }
 
-  List<String> convertCSV(List<List<dynamic>> csvList) {
-    List<String> stringList = [];
-    for (var csv in csvList) {
-      String s = capitalize(csv[0].toString());
-      stringList.add(s);
+  List<String> capitaliseList(List<String> strings) {
+    for (var i = 0; i < strings.length; i++) {
+      strings[i] = capitalise(strings[i]);
     }
-    return stringList;
+    return strings;
   }
 
-  String capitalize(String s) => s[0].toUpperCase() + s.substring(1);
+  String capitalise(String s) => s[0].toUpperCase() + s.substring(1);
 
   Future<String> getFileData(String path) async {
     return await rootBundle.loadString(path);
   }
 
   void _pushGame(int index, String mode, var alertChoice) {
-    if (widget.mode == "Multiplayer Mode") {
-      Navigator.of(context).push(
-          new MaterialPageRoute(
-              builder: (context) {
-                return new MyHomePage(title: "Hello",
-                    channel: IOWebSocketChannel.connect(
-                        'ws://trends-test-app.herokuapp.com'));
-              }
-          )
-      );
-    } else {
-      Navigator.of(context).push(
-          new MaterialPageRoute(
-              builder: (context) {
-                return new QueryPage(title: topics[index], terms: themesMap[topics[index]], mode: mode, alertChoice: alertChoice,);
-              }
-          )
-      );
-    }
+    Navigator.of(context).push(
+      new MaterialPageRoute(
+        builder: (context) {
+          return new QueryPage(title: topics[index], terms: themesMap[topics[index]], mode: mode, alertChoice: alertChoice,);
+        }
+      )
+    );
   }
 
   List<String> _allTopics(Map map) {

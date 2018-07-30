@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'themeSelect.dart';
-import 'multiplayerMode.dart';
-import 'multiplayerSetup.dart';
-import 'package:web_socket_channel/io.dart';
+
 
 import 'dart:async';
 
@@ -38,7 +36,6 @@ class _ModeSelectPageState extends State<ModeSelectPage> {
           ),*/
           modeSelectionButton("Party Mode"),
           modeSelectionButton("CPU Mode"),
-          modeSelectionButton("Online Multiplayer"),
         ],
       ),
     );
@@ -58,11 +55,6 @@ class _ModeSelectPageState extends State<ModeSelectPage> {
 
           case "CPU Mode": {
             _choicesAlert("CPU Mode", ["Impossible", "Hard", "Normal", "Easy"], "Select Difficulty");
-            break;
-          }
-
-          case "Online Multiplayer": {
-            _choicesAlert("Multiplayer Mode", ["Host Game", "Join Game"]);
             break;
           }
 
@@ -121,43 +113,6 @@ class _ModeSelectPageState extends State<ModeSelectPage> {
     );
   }
 
-  Future<Null> _enterRoomAlert() async {
-    final myController = new TextEditingController();
-    return showDialog<Null>(
-      context: context,
-      builder: (BuildContext context) {
-        return new AlertDialog(
-          title: new Text('Enter Room Name'),
-          content: new TextField(
-              controller: myController,
-              autofocus: true,
-              decoration: new InputDecoration(
-                  filled: true,
-                  border: new OutlineInputBorder(
-                    borderRadius: new BorderRadius.circular(12.0),
-                  ),
-                  hintText: 'Please Enter Room Name'
-              )
-          ),
-          actions: <Widget>[
-            new FlatButton(
-              child: new Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            new FlatButton(
-              child: new Text('Enter Room'),
-              onPressed: () {
-                _pushThemeSelect(myController.text, "Multiplayer Mode");
-              },
-            )
-          ],
-        );
-      },
-    );
-  }
-
   Widget verticalLayout(List<Widget> widgets) {
     return new Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -180,25 +135,14 @@ class _ModeSelectPageState extends State<ModeSelectPage> {
 
 
   void _pushThemeSelect(var alertChoice, String mode) {
-    if (mode == "Multiplayer Mode") {
-       Navigator.of(context).push(
-           new MaterialPageRoute(
-               builder: (context) {
-                 return new MultiplayerPage(
-                     title: "Hello", alertChoice: alertChoice, mode: mode);
-               }
-           )
-       );
-    } else {
-      Navigator.of(context).push(
-          new MaterialPageRoute(
-              builder: (context) {
-                return new ThemeSelectPage(
-                    title: "Hello", alertChoice: alertChoice, mode: mode);
-              }
-          )
-      );
-    }
+    Navigator.of(context).push(
+      new MaterialPageRoute(
+        builder: (context) {
+          return new ThemeSelectPage(
+              title: "Hello", alertChoice: alertChoice, mode: mode);
+        }
+      )
+    );
   }
 
 }

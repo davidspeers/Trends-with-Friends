@@ -29,8 +29,7 @@ class _AddLevelPageState extends State<AddLevelPage> {
     '11',
     '12',
     '13',
-    '14',
-    '15',
+    '14'
   ];
 
   @override

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'modeSelect.dart';
+import 'addLevel.dart';
 
 void main() => runApp(new MyApp());
 
@@ -9,8 +10,7 @@ class MyApp extends StatelessWidget {
     return new MaterialApp(
       title: 'Google Trends Game',
       theme: new ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+          primarySwatch: Colors.blue, primaryColor: new Color(0xffd05c6b)),
       home: new HomePage(title: 'Trends Game Home Page'),
     );
   }
@@ -30,10 +30,10 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      appBar: new AppBar(
-        title: new Text(widget.title),
-      ),
-      body: _homePageUI()
+        appBar: new AppBar(
+          title: new Text(widget.title),
+        ),
+        body: _homePageUI()
     );
   }
 
@@ -57,7 +57,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget customButton(String text) {
     return new MaterialButton(
-      onPressed: _pushModeSelect,
+      onPressed: () => _pushSelected(text),
       height: 70.0,
       minWidth: double.infinity,
       color: Theme.of(context).primaryColor,
@@ -67,16 +67,28 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _pushModeSelect() {
-    Navigator.of(context).push(
-      new MaterialPageRoute(
-        builder: (context) {
-          return new ModeSelectPage(title: "Hello");
-        }
-      )
-    );
+  void _pushSelected(String choice) {
+
+    switch (choice) {
+      case "Add Level":
+        Navigator.of(context).push(
+            new MaterialPageRoute(
+                builder: (context) {
+                  return new AddLevelPage(title: choice);
+                }
+            )
+        );
+        break;
+
+      default:
+        Navigator.of(context).push(
+            new MaterialPageRoute(
+                builder: (context) {
+                  return new ModeSelectPage(title: "Hello");
+                }
+            )
+        );
+    }
   }
 
 }
-
-

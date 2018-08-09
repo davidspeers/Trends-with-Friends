@@ -9,10 +9,11 @@ import 'dart:async';
 
 
 class QueryPage extends StatefulWidget {
-  QueryPage({Key key, this.title, this.terms, this.mode, this.alertChoice}) : super(key: key);
+  QueryPage({Key key, this.title, this.terms, this.futureTerms, this.mode, this.alertChoice}) : super(key: key);
 
   final String title;
   final List<String> terms;
+  final Future<List<String>> futureTerms;
   final String mode;
   final dynamic alertChoice;
 
@@ -30,6 +31,8 @@ class _QueryPageState extends State<QueryPage> {
   var termIndex = 0;
   var score = 0;
   List<int> results = [];
+  //Declare queries here so that they can be accessed by FAB and _pushResults()
+  List<String> convertedTerms;
 
   @override
   void dispose() {
@@ -44,25 +47,22 @@ class _QueryPageState extends State<QueryPage> {
   }
 
   Widget _queryPageUI() {
+
     List<Widget> children = [
-      new Text(
-      "Match 1 word with:\n${widget.terms[termIndex]}",
-      style: whiteTextSmall,
-      ),
       new TextField(
-        controller: myController,
-        autofocus: true,
-        decoration: new InputDecoration(
-          fillColor: Colors.yellow,
-          filled: true,
-          contentPadding: new EdgeInsets.fromLTRB(
-            10.0, 30.0, 10.0, 10.0
-          ),
-          border: new OutlineInputBorder(
-            borderRadius: new BorderRadius.circular(12.0),
-          ),
-          hintText: 'Please Enter Term'
-        )
+          controller: myController,
+          autofocus: true,
+          decoration: new InputDecoration(
+              fillColor: Colors.yellow,
+              filled: true,
+              contentPadding: new EdgeInsets.fromLTRB(
+                  10.0, 30.0, 10.0, 10.0
+              ),
+              border: new OutlineInputBorder(
+                borderRadius: new BorderRadius.circular(12.0),
+              ),
+              hintText: 'Please Enter Term'
+          )
       )
     ];
     if (widget.mode == "Party Mode") {
@@ -75,18 +75,75 @@ class _QueryPageState extends State<QueryPage> {
       );
     }
 
+    Widget body;
+    int queryInsertIndex = (widget.mode == "Party Mode") ? 1 : 0;
+
+    if (widget.title == "Random Words") {
+      print("Random");
+      body = new FutureBuilder(
+          future: widget.futureTerms,
+          builder: (BuildContext context, AsyncSnapshot<List<String>> snapshot) {
+            //The below line insures no error message and just an empty container shows while the data is loading
+            //It can be replaced with a circular spinner or something else
+            if (!snapshot.hasData) return new Container();
+            convertedTerms = snapshot.data;
+            print("content - $convertedTerms");
+            children.insert(
+                queryInsertIndex,
+                new Text(
+                  "Match 1 word with:\n${convertedTerms[termIndex]}",
+                  style: whiteTextSmall,
+                )
+            );
+            return new Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: new Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,//align left
+                    children: children
+                )
+            );
+            /*return new ListView.builder(
+          scrollDirection: Axis.vertical,
+          padding: new EdgeInsets.all(6.0),
+          itemCount: content.length,
+          itemBuilder: (BuildContext context, int index) {
+            return new Container(
+              alignment: FractionalOffset.center,
+              margin: new EdgeInsets.only(bottom: 6.0),
+              padding: new EdgeInsets.all(6.0),
+              color: Colors.blueGrey,
+              child: new Text('${content[index]}'),
+            );
+          },
+        );*/
+          }
+      );
+    } else {
+      print("Not random");
+      //Add term to children list
+      convertedTerms = widget.terms;
+      children.insert(
+          queryInsertIndex,
+          new Text(
+            "Match 1 word with:\n${convertedTerms[termIndex]}",
+            style: whiteTextSmall,
+          )
+      );
+      body = new Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: new Column(
+              crossAxisAlignment: CrossAxisAlignment.start,//align left
+              children: children
+          )
+      );
+    }
+
     return Scaffold(
       appBar: new AppBar(
         leading: homeIcon(context),
         title: new Text('Retrieve Text Input ${widget.title}'),
       ),
-      body: new Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: new Column(
-            crossAxisAlignment: CrossAxisAlignment.start,//align left
-            children: children
-          )
-      ),
+      body: body,
       backgroundColor: bgColor,
       floatingActionButton: new FloatingActionButton(
         // When the user presses the button, show an alert dialog with the
@@ -96,7 +153,7 @@ class _QueryPageState extends State<QueryPage> {
         onPressed: () async {
           switch (widget.mode) {
             case ("Party Mode"): {
-              queries[teamNum] = myController.text + " " + widget.terms[termIndex];
+              queries[teamNum] = myController.text + " " + convertedTerms[termIndex];
               if (teamNum < widget.alertChoice) {
                 setState(() {
                   bgColor = bgColors[teamNum];
@@ -105,7 +162,7 @@ class _QueryPageState extends State<QueryPage> {
                 });
               } else {
                 // List<int> scores returned from results.dart
-                if (termIndex < widget.terms.length-1) {
+                if (termIndex < convertedTerms.length-1) {
                   List<int> scores = await _pushResults(false);
                   setState(() {
                     bgColor = bgColors[0];
@@ -122,8 +179,8 @@ class _QueryPageState extends State<QueryPage> {
             }
 
             case ("CPU Mode"): {
-              queries["User Answer"] = myController.text + " " + widget.terms[termIndex];
-              if (termIndex < widget.terms.length-1) {
+              queries["User Answer"] = myController.text + " " + convertedTerms[termIndex];
+              if (termIndex < convertedTerms.length-1) {
                 List<int> scores = await _pushResults(false);
                 myController.text = "";
                 termIndex++;
@@ -134,7 +191,6 @@ class _QueryPageState extends State<QueryPage> {
               break;
             }
           }
-
         },
         tooltip: 'Show me the value!',
         child: new Icon(Icons.send),
@@ -149,7 +205,11 @@ class _QueryPageState extends State<QueryPage> {
       new MaterialPageRoute(
         builder: (context) {
           return new ResultsPage(
-            title: "Hello", queries: queriesList, lastQuery: lastQuery, previousResults: results, term: widget.terms[termIndex], mode: widget.mode, alertChoice: widget.alertChoice
+            title: "Hello", queries: queriesList,
+            lastQuery: lastQuery, previousResults: results,
+            term: convertedTerms[termIndex],
+            mode: widget.mode,
+            alertChoice: widget.alertChoice
           );
         }
       )

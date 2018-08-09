@@ -70,10 +70,8 @@ class _FinalScorePageState extends State<FinalScorePage> {
         }
         break;
       }
-
-      return winners;
     }
-
+    return winners;
   }
 
   //Return all the indexes of the highest scores

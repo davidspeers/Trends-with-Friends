@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'themeSelect.dart';
 
-
 import 'dart:async';
 
 class ModeSelectPage extends StatefulWidget {
@@ -139,7 +138,8 @@ class _ModeSelectPageState extends State<ModeSelectPage> {
       new MaterialPageRoute(
         builder: (context) {
           return new ThemeSelectPage(
-              title: "Hello", alertChoice: alertChoice, mode: mode);
+            title: "Hello", alertChoice: alertChoice, mode: mode
+          );
         }
       )
     );

@@ -12,6 +12,10 @@ class MyApp extends StatelessWidget {
       theme: new ThemeData(
           primarySwatch: Colors.blue, primaryColor: new Color(0xffd05c6b)),
       home: new HomePage(title: 'Trends Game Home Page'),
+      routes: <String, WidgetBuilder>{
+        '/mode': (BuildContext context) => new ModeSelectPage(title: "Mode Select"),
+        '/addLevel': (BuildContext context) => new AddLevelPage(title: "Custom Levels")
+      },
     );
   }
 }
@@ -46,7 +50,6 @@ class _HomePageState extends State<HomePage> {
             'You have pushed the button this many times:',
             style: Theme.of(context).textTheme.display1,
           ),*/
-          customButton("Continue Game"),
           customButton("Start"),
           customButton("Tutorial"),
           customButton("Add Level")
@@ -71,13 +74,7 @@ class _HomePageState extends State<HomePage> {
 
     switch (choice) {
       case "Add Level":
-        Navigator.of(context).push(
-            new MaterialPageRoute(
-                builder: (context) {
-                  return new AddLevelPage(title: choice);
-                }
-            )
-        );
+        Navigator.of(context).pushNamed('/addLevel');
         break;
 
       default:

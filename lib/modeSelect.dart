@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'themeSelect.dart';
 
 import 'dart:async';
+import 'customWidgets.dart';
 
 class ModeSelectPage extends StatefulWidget {
   ModeSelectPage({Key key, @required this.title}) : super(key: key);
@@ -96,12 +97,13 @@ class _ModeSelectPageState extends State<ModeSelectPage> {
           default: {
             if (title == null) {
               return new AlertDialog(
-                content: verticalLayout(buttons)
+                //verticalAlertDialog is found in customWidgets
+                content: verticalAlertLayout(buttons)
               );
             } else {
               return new AlertDialog(
                 title: new Text(title),
-                content: verticalLayout(buttons)
+                content: verticalAlertLayout(buttons)
               );
             }
           }
@@ -109,14 +111,6 @@ class _ModeSelectPageState extends State<ModeSelectPage> {
         }
 
       },
-    );
-  }
-
-  Widget verticalLayout(List<Widget> widgets) {
-    return new Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      mainAxisSize: MainAxisSize.min,
-      children: widgets,
     );
   }
 

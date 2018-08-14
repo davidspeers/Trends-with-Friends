@@ -168,6 +168,10 @@ class _ResultsPageState extends State<ResultsPage> {
           itemCount: totals.length,
         );
       }
+
+      default: {
+        return new Text("Error - mode not of expected type");
+      }
     }
 
   }

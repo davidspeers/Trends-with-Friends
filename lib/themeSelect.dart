@@ -185,7 +185,7 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
   }
 
   Future<List<String>> getRandomWords() async {
-    String data = await getFileData('csv/word-freq-top4999.csv');
+    String data = await getFileData('assets/csv/word-freq-top4999.csv');
     List<String> rowsAsList = data.split("\n");
     List<String> randomWords = capitaliseList((rowsAsList..shuffle()).sublist(0, 10));
     print("randomWords - $randomWords");

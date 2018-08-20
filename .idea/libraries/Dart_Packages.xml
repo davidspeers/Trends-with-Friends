@@ -44,6 +44,20 @@
             </list>
           </value>
         </entry>
+        <entry key="charts_common">
+          <value>
+            <list>
+              <option value="$PROJECT_DIR$/../../Flutter/.pub-cache/hosted/pub.dartlang.org/charts_common-0.4.0/lib" />
+            </list>
+          </value>
+        </entry>
+        <entry key="charts_flutter">
+          <value>
+            <list>
+              <option value="$PROJECT_DIR$/../../Flutter/.pub-cache/hosted/pub.dartlang.org/charts_flutter-0.4.0/lib" />
+            </list>
+          </value>
+        </entry>
         <entry key="collection">
           <value>
             <list>
@@ -160,6 +174,13 @@
           <value>
             <list>
               <option value="$PROJECT_DIR$/../../Flutter/.pub-cache/hosted/pub.dartlang.org/image-2.0.4/lib" />
+            </list>
+          </value>
+        </entry>
+        <entry key="intl">
+          <value>
+            <list>
+              <option value="$PROJECT_DIR$/../../Flutter/.pub-cache/hosted/pub.dartlang.org/intl-0.15.7/lib" />
             </list>
           </value>
         </entry>
@@ -445,6 +466,8 @@
       <root url="file://$PROJECT_DIR$/../../Flutter/.pub-cache/hosted/pub.dartlang.org/async-2.0.7/lib" />
       <root url="file://$PROJECT_DIR$/../../Flutter/.pub-cache/hosted/pub.dartlang.org/boolean_selector-1.0.3/lib" />
       <root url="file://$PROJECT_DIR$/../../Flutter/.pub-cache/hosted/pub.dartlang.org/charcode-1.1.1/lib" />
+      <root url="file://$PROJECT_DIR$/../../Flutter/.pub-cache/hosted/pub.dartlang.org/charts_common-0.4.0/lib" />
+      <root url="file://$PROJECT_DIR$/../../Flutter/.pub-cache/hosted/pub.dartlang.org/charts_flutter-0.4.0/lib" />
       <root url="file://$PROJECT_DIR$/../../Flutter/.pub-cache/hosted/pub.dartlang.org/collection-1.14.6/lib" />
       <root url="file://$PROJECT_DIR$/../../Flutter/.pub-cache/hosted/pub.dartlang.org/convert-2.0.1/lib" />
       <root url="file://$PROJECT_DIR$/../../Flutter/.pub-cache/hosted/pub.dartlang.org/crypto-2.0.3/lib" />
@@ -460,6 +483,7 @@
       <root url="file://$PROJECT_DIR$/../../Flutter/.pub-cache/hosted/pub.dartlang.org/http_multi_server-2.0.4/lib" />
       <root url="file://$PROJECT_DIR$/../../Flutter/.pub-cache/hosted/pub.dartlang.org/http_parser-3.1.2/lib" />
       <root url="file://$PROJECT_DIR$/../../Flutter/.pub-cache/hosted/pub.dartlang.org/image-2.0.4/lib" />
+      <root url="file://$PROJECT_DIR$/../../Flutter/.pub-cache/hosted/pub.dartlang.org/intl-0.15.7/lib" />
       <root url="file://$PROJECT_DIR$/../../Flutter/.pub-cache/hosted/pub.dartlang.org/io-0.3.2+1/lib" />
       <root url="file://$PROJECT_DIR$/../../Flutter/.pub-cache/hosted/pub.dartlang.org/js-0.6.1/lib" />
       <root url="file://$PROJECT_DIR$/../../Flutter/.pub-cache/hosted/pub.dartlang.org/kernel-0.3.0-alpha.12/lib" />

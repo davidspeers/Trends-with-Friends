@@ -20,3 +20,8 @@ final blackTextSmall = new TextStyle(
     color: Colors.black87,
     fontSize: 10.0
 ).apply(fontSizeFactor: 2.0);
+
+final greyTextSmall = new TextStyle(
+    color: Colors.grey,
+    fontSize: 10.0
+).apply(fontSizeFactor: 2.0);

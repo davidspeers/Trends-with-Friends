@@ -118,3 +118,26 @@ Widget verticalAlertLayout(List<Widget> widgets) {
     children: widgets,
   );
 }
+
+class SimpleScaffold extends StatelessWidget {
+  const SimpleScaffold({
+    Key key,
+    this.title,
+    this.child,
+  }) : super(key: key);
+
+  final String title;
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return new Scaffold(
+      appBar: new AppBar(
+        title: new Text(title),
+      ),
+      body: child,
+    );
+  }
+}
+

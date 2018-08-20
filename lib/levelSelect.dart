@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 
 import 'query.dart';
+import 'customWidgets.dart';
 
 class ThemeSelectPage extends StatefulWidget {
   ThemeSelectPage({Key key, this.title, this.alertChoice, this.mode, this.teamName, this.roomName}) : super(key: key);
@@ -62,7 +63,7 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
     List<Widget> slivers = new List<Widget>();
 
     int i = 0;
-    slivers.addAll(_buildLists(context, i, i += 3, myLists));
+    slivers.addAll(_buildLists(context, i, i+=myLists.length, myLists));
     //slivers.addAll(_buildGrids(context, i, i += 3));
     return slivers;
   }
@@ -71,7 +72,8 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
     return List.generate(count, (sliverIndex) {
       sliverIndex += firstIndex;
       return new SliverStickyHeader(
-        header: _buildHeader(sliverIndex),
+        //buildHeader found in customWidget.dart
+        header: _buildHeader(sliverIndex, headings),
         sliver: new SliverList(
           delegate: new SliverChildBuilderDelegate(
                 (context, i) => new ListTile(
@@ -123,14 +125,14 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
     });
   }*/
 
-  Widget _buildHeader(int index, {String text}) {
+  Widget _buildHeader(int index, List<String> headings) {
     return new Container(
       height: 60.0,
       color: Colors.lightBlue,
       padding: EdgeInsets.symmetric(horizontal: 16.0),
       alignment: Alignment.centerLeft,
       child: new Text(
-        text ?? headings[index],
+        headings[index],
         style: const TextStyle(color: Colors.white),
       ),
     );
@@ -205,26 +207,4 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
 
   String capitalise(String s) => s[0].toUpperCase() + s.substring(1);
 
-}
-
-class SimpleScaffold extends StatelessWidget {
-  const SimpleScaffold({
-    Key key,
-    this.title,
-    this.child,
-  }) : super(key: key);
-
-  final String title;
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text(title),
-      ),
-      body: child,
-    );
-  }
 }

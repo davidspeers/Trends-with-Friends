@@ -24,6 +24,8 @@ class _AddLevelPageState extends State<AddLevelPage> {
     });
   }
 
+  //"CustomLevels" contains the title of each custom level
+  //"$title" will give you a list of strings of that levels queries
   setSharedPrefs(String chosenLevel, ListChoices listChoice) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setStringList("CustomLevels", items);

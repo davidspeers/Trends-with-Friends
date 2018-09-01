@@ -25,3 +25,10 @@ final greyTextSmall = new TextStyle(
     color: Colors.grey,
     fontSize: 10.0
 ).apply(fontSizeFactor: 2.0);
+
+TextStyle customFont({@required Color color, @required double fontsize}) {
+  return new TextStyle(
+    color: color,
+    fontSize: fontsize,
+  ).apply(fontSizeFactor: 2.0);
+}

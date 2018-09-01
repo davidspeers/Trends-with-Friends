@@ -1,3 +1,5 @@
+import 'dart:math';
+
 List<int> addLists(List<int> list1, List<int> list2) {
   if (list1.isEmpty) {
     return list2;
@@ -22,3 +24,11 @@ String toTitleCase(String str) {
   // Directly return the joined string
   return splitStr.join(' ');
 }
+
+var _random = new Random();
+///From min inclusive to max exclusive
+int randomRange(int min, int max) => min + _random.nextInt(max - min);
+///From 0 inclusive to max exclusive
+double randomDouble(double max) => _random.nextInt(max.toInt()).toDouble();
+///From min inclusive to max exclusive
+double randomDoubleRange(double min, double max) => (min + randomDouble(max - min)).toDouble();

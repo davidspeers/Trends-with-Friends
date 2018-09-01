@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter/services.dart' show rootBundle;
 import 'dart:async';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 
 import 'query.dart';
@@ -31,11 +32,24 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
     'Star Wrs': ["Saber", "Force", "Blaster", "Jedi", "Speeder"],//, "Space", "Emperor", "Projection"]
   };
 
-  Map customThemesMap = {
-    'Star': ["Force", "Blaster", "Jedi", "Speeder"],//, "Space", "Emperor", "Projection"]
-    'Sta': ["Force", "Blaster", "Jedi", "Speeder"],//, "Space", "Emperor", "Projection"]
-    'St': ["Force", "Blaster", "Jedi", "Speeder"],//, "Space", "Emperor", "Projection"]
-  };
+  //The following code instantiates my customThemesMap
+  Map customThemesMap = {};
+  List<String> customLevelTitles;
+  getSharedPrefs() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    customLevelTitles = prefs.getStringList("CustomLevels") ?? [];
+    customLevelTitles.forEach((title) {
+      customThemesMap[title] = prefs.getStringList(title);
+    });
+    setState(() {
+      customThemesMap;
+    });
+  }
+  @override
+  void initState() {
+    super.initState();
+    getSharedPrefs();
+  }
 
   List<String> randomWordsList;
 

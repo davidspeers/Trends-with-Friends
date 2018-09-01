@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'dart:collection'; //Needed for LinkedHashMap (which is needed to maintain forEach order)
 import 'fontStyles.dart';
+import 'globalVals.dart';
 
 List<String> userAnswers;
 
@@ -128,9 +129,18 @@ class _SelectionCallbackState extends State<TimeSeriesCallbackChart> {
   @override
   Widget build(BuildContext context) {
     // The children consist of a Chart and Text widgets below to hold the info.
+    List<charts.SeriesLegend> legend;
+    if (userAnswers.length == 5) {
+      legend = [new charts.SeriesLegend(
+        position: charts.BehaviorPosition.start,
+        horizontalFirst: false
+      )];
+    } else {
+      legend = [new charts.SeriesLegend()];
+    }
     final children = <Widget>[
       new SizedBox(
-          height: 200.0,
+          height: 250.0,
           child: new charts.TimeSeriesChart(
             widget.seriesList,
             animate: widget.animate,
@@ -140,6 +150,7 @@ class _SelectionCallbackState extends State<TimeSeriesCallbackChart> {
                 listener: _onSelectionChanged,
               )
             ],
+            behaviors: legend,
           )
       ),
     ];
@@ -174,8 +185,13 @@ class _SelectionCallbackState extends State<TimeSeriesCallbackChart> {
     _measures?.forEach((String series, num value) {
       children.add(
         new Container(
-          color: Colors.red,
-          child: new Text('${userAnswers[i]}: ${value}'),
+          color: globalColors[i],
+          width: double.infinity,
+          alignment: Alignment.center,
+          child: new Text(
+            '${userAnswers[i]}: ${value}',
+            style: whiteTextSmall,
+          ),
         )
       );
       i++;

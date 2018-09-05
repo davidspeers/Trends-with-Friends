@@ -1,53 +1,55 @@
 import 'package:flutter/material.dart';
 
 //Note: the enums are located in this file
-import 'levelEditor.dart';
+import 'themesEditor.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-class AddLevelPage extends StatefulWidget {
-  AddLevelPage({Key key, this.title}) : super(key: key);
+import 'routes.dart';
+
+class AddThemePage extends StatefulWidget {
+  AddThemePage({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
-  _AddLevelPageState createState() => new _AddLevelPageState();
+  _AddThemePageState createState() => new _AddThemePageState();
 }
 
-class _AddLevelPageState extends State<AddLevelPage> {
+class _AddThemePageState extends State<AddThemePage> {
   List<String> items = [];
 
   getSharedPrefs() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      items = prefs.getStringList("CustomLevels") ?? [];
+      items = prefs.getStringList("CustomThemes") ?? [];
     });
   }
 
-  //"CustomLevels" contains the title of each custom level
-  //"$title" will give you a list of strings of that levels queries
-  setSharedPrefs(String chosenLevel, ListChoices listChoice) async {
+  //"CustomThemes" contains the title of each custom theme
+  //"$title" will give you a list of strings of that themes queries
+  setSharedPrefs(String chosenTheme, ListChoices listChoice) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setStringList("CustomLevels", items);
+    prefs.setStringList("CustomThemes", items);
     if (listChoice == ListChoices.delete) {
-      prefs.remove(chosenLevel);
+      prefs.remove(chosenTheme);
     }
   }
 
   @override
   void initState() {
-    super.initState();
     getSharedPrefs();
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return _addLevelPageUI();
+    return _addThemePageUI();
   }
 
-  Widget _addLevelPageUI() {
+  Widget _addThemePageUI() {
 
-    var levelsList = new ListView.builder(
+    var themesList = new ListView.builder(
       itemCount: items.length,
       itemBuilder: (BuildContext context, item) {
         return new SizedBox(
@@ -59,19 +61,19 @@ class _AddLevelPageState extends State<AddLevelPage> {
                 itemBuilder: (BuildContext context) => <PopupMenuEntry<ListChoices>>[
                   const PopupMenuItem<ListChoices>(
                     value: ListChoices.delete,
-                    child: const Text('Delete Level'),
+                    child: const Text('Delete Theme'),
                   ),
                   const PopupMenuItem<ListChoices>(
                     value: ListChoices.edit,
-                    child: const Text('Edit Level'),
+                    child: const Text('Edit Theme'),
                   ),
                   const PopupMenuItem<ListChoices>(
                     value: ListChoices.moveToTop,
-                    child: const Text('Move Level to top of List'),
+                    child: const Text('Move Theme to top of List'),
                   ),
                   const PopupMenuItem<ListChoices>(
                     value: ListChoices.moveToBottom,
-                    child: const Text('Move Level to bottom of List'),
+                    child: const Text('Move Theme to bottom of List'),
                   ),
                 ],
               )
@@ -84,10 +86,11 @@ class _AddLevelPageState extends State<AddLevelPage> {
     return new Scaffold(
       appBar: new AppBar(
         title: new Text(widget.title),
+        backgroundColor: Colors.green[400],
         actions: <Widget>[
           FlatButton(
-            child: Text("Add Level"),
-            onPressed: () => _pushLevelEditor(levelEditType: LevelEditingTypes.add),
+            child: Text("Add Theme"),
+            onPressed: () => _pushThemeEditor(themeEditType: ThemeEditingTypes.add),
           )
         ],
       ),
@@ -96,7 +99,7 @@ class _AddLevelPageState extends State<AddLevelPage> {
           child: new Column(
               children: <Widget>[
                 new Expanded(
-                    child: levelsList
+                    child: themesList
                 )
 
               ]
@@ -106,7 +109,7 @@ class _AddLevelPageState extends State<AddLevelPage> {
   }
 
   void executeChoice(ListChoices choice, int itemNumber) {
-    String chosenLevel = items[itemNumber];
+    String chosenTheme = items[itemNumber];
     switch (choice) {
       case (ListChoices.delete): {
         //items.removeAt(itemNumber);
@@ -117,7 +120,7 @@ class _AddLevelPageState extends State<AddLevelPage> {
       }
 
       case (ListChoices.edit): {
-        _pushLevelEditor(levelEditType: LevelEditingTypes.edit, levelTitle: items[itemNumber]);
+        _pushThemeEditor(themeEditType: ThemeEditingTypes.edit, themeTitle: items[itemNumber]);
         break;
       }
 
@@ -147,10 +150,10 @@ class _AddLevelPageState extends State<AddLevelPage> {
         print("Error - ListChoices not of expected enum");
       }
     }
-    setSharedPrefs(chosenLevel, choice);
+    setSharedPrefs(chosenTheme, choice);
   }
 
-  void _pushLevelEditor({LevelEditingTypes levelEditType, String levelTitle}) {
+  void _pushThemeEditor({ThemeEditingTypes themeEditType, String themeTitle}) {
     /*setState(() {
       for (int i = 0; i < 3; i++) {
         items.add(
@@ -158,31 +161,17 @@ class _AddLevelPageState extends State<AddLevelPage> {
         );
       }
     });*/
-    switch (levelEditType) {
-      case (LevelEditingTypes.add): {
-        Navigator.of(context).push(
-          new MaterialPageRoute(
-            builder: (context) {
-              return new LevelEditorPage(
-                title: "Hello", levelEditingType: levelEditType, existingLevels: items);
-            }
-          )
-        );
+    switch (themeEditType) {
+      case (ThemeEditingTypes.add): {
+        Navigator.of(context).push(ThemesEditorPageRoute(themeEditingType: themeEditType, existingThemes: items));
         break;
       }
-      case (LevelEditingTypes.edit): {
-        Navigator.of(context).push(
-          new MaterialPageRoute(
-            builder: (context) {
-              return new LevelEditorPage(
-                title: "Hello", levelEditingType: levelEditType, existingLevels: items, levelTitle: levelTitle);
-            }
-          )
-        );
+      case (ThemeEditingTypes.edit): {
+        Navigator.of(context).push(ThemesEditorPageRoute(themeEditingType: themeEditType, existingThemes: items, themeTitle: themeTitle));
         break;
       }
       default: {
-        print("Error - LevelEditingType of wrong type (probably null)");
+        print("Error - ThemeEditingType of wrong type (probably null)");
       }
     }
   }

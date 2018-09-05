@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'result.dart';
+import 'routes.dart';
 
+import 'result.dart';
 import 'customWidgets.dart';
 import 'functions.dart';
 import 'fontStyles.dart';
+
 
 import 'dart:async';
 
@@ -202,16 +204,13 @@ class _QueryPageState extends State<QueryPage> {
     //Converts map to List
     List<String> queriesList = new List<String>.from(queries.values.toList());
     return Navigator.of(context).push(
-      new MaterialPageRoute(
-        builder: (context) {
-          return new ResultsPage(
-            title: "Hello", queries: queriesList,
-            lastQuery: lastQuery, previousResults: results,
-            term: convertedTerms[termIndex],
-            mode: widget.mode,
-            alertChoice: widget.alertChoice
-          );
-        }
+      new ResultsPageRoute(
+        queriesList,
+        lastQuery,
+        results,
+        convertedTerms[termIndex],
+        widget.mode,
+        widget.alertChoice
       )
     );
   }

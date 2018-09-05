@@ -10,6 +10,16 @@ final whiteTextSmall = new TextStyle(
     fontSize: 15.0
 ).apply(fontSizeFactor: 2.0);
 
+final blackHeading = new TextStyle(
+  color: Colors.black,
+  fontSize: 14.0,
+).apply(fontSizeFactor: 2.0);
+
+final blackParagraph = new TextStyle(
+  color: Colors.black,
+  fontSize: 7.0,
+).apply(fontSizeFactor: 2.0);
+
 final blackTextBold = new TextStyle(
   color: Colors.black,
   fontSize: 30.0,

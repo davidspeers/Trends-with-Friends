@@ -39,9 +39,12 @@ class _AchievementsPageState extends State<AchievementsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return new SimpleScaffold(
-      title: 'Flutter Sticky Header example',
-      child: new Builder(builder: (BuildContext context) {
+    return new Scaffold(
+      appBar: new AppBar(
+        title: Text(widget.title),
+        backgroundColor: Colors.green,
+      ),
+      body: new Builder(builder: (BuildContext context) {
         return new CustomScrollView(slivers: _buildSlivers(context));
       }),
     );

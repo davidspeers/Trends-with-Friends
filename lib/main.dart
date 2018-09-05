@@ -5,11 +5,10 @@ import 'package:flutter/material.dart';
 
 import 'functions.dart';
 
-import 'modeSelect.dart';
-import 'addLevel.dart';
+import 'themesCreator.dart';
 import 'achievements.dart';
 import 'about.dart';
-import 'levelSelect.dart';
+import 'themeSelect.dart';
 
 import 'fontStyles.dart';
 
@@ -18,6 +17,10 @@ import 'package:flutter/cupertino.dart';
 import 'animations.dart';
 import 'globalVals.dart';
 
+import 'routes.dart';
+
+String txt = "If this is your first time playing Trends With Friends - welcome..."
+    "or you've never used GT before we recommend you press the ? and read the How To Play section";
 
 void main() => runApp(new MyApp());
 
@@ -32,12 +35,6 @@ class MyApp extends StatelessWidget {
       theme: new ThemeData(
           primarySwatch: Colors.blue, primaryColor: new Color(0xffd05c6b)),
       home: new AnimatedHome(),
-      routes: <String, WidgetBuilder>{
-        '/mode': (BuildContext context) => new ModeSelectPage(title: "Mode Select"),
-        '/addLevel': (BuildContext context) => new AddLevelPage(title: "Custom Levels"),
-        '/achievements': (BuildContext context) => new AchievementsPage(title: "Custom Levels"),
-        '/about': (BuildContext context) => new AboutPage(title: "About"),
-      },
     );
   }
 }
@@ -81,7 +78,7 @@ class AnimatedHomeState extends State<AnimatedHome> with TickerProviderStateMixi
   Color changeValButtonColor = Colors.blue[400];
   Color aboutButtonColor = Colors.red[400];
   Color bottomButtonsColor = Colors.green[400];
-  Color cardColor = Color.fromRGBO(210, 210, 210, 0.85);
+  Color cardColor = Color.fromRGBO(210, 210, 210, 0.9);
   Color secondaryButtonColor = Colors.black87;
   Color partyButtonBg = Colors.blue[300];
   Color cpuButtonBg = Colors.red[300];
@@ -236,7 +233,7 @@ class AnimatedHomeState extends State<AnimatedHome> with TickerProviderStateMixi
                 customIconButton(
                     iconImage: Icons.help,
                     size: 45.0,
-                    myOnPressed: () => Navigator.of(context).pushNamed('/about'),
+                    myOnPressed: () => Navigator.of(context).push(AboutPageRoute()),
                     mainColor: aboutButtonColor
                 )
               ],
@@ -345,7 +342,7 @@ class AnimatedHomeState extends State<AnimatedHome> with TickerProviderStateMixi
 
   Widget _homePageUI() {
 
-    final List<String> buttons = ["Add Level", "Achievements"];
+    final List<String> buttons = ["Themes Creator", "Achievements"];
 
     List<Widget> myButtons = [];
 
@@ -393,7 +390,7 @@ class AnimatedHomeState extends State<AnimatedHome> with TickerProviderStateMixi
 
   Widget customButton(String text) {
     EdgeInsets myPadding;
-    if (text == 'Add Level') {
+    if (text == 'Themes Creator') {
       myPadding = EdgeInsets.fromLTRB(16.0, 0.0, 8.0, 16.0);
     } else if (text == 'Achievements') {
       myPadding = EdgeInsets.fromLTRB(8.0, 0.0, 16.0, 16.0);
@@ -403,14 +400,14 @@ class AnimatedHomeState extends State<AnimatedHome> with TickerProviderStateMixi
     return new Padding(
         padding: myPadding,
         child: ButtonTheme(
-          height: 70.0,
+          height: 60.0,
           child: RaisedButton(
               onPressed: () => _pushSelected(text),
               color: bottomButtonsColor,
               textColor: secondaryButtonColor,
-              child: new Text(text, style: customFont(color: Colors.black87, fontsize: 8.0)),
+              child: new Text(text, style: customFont(color: Colors.black87, fontsize: 7.0)),
               //splashColor: globalColorsToAccent[color], //hold button to see
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15.0)))
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(30.0)))
           ),
         )
     );
@@ -420,12 +417,12 @@ class AnimatedHomeState extends State<AnimatedHome> with TickerProviderStateMixi
   void _pushSelected(String choice, {var alertChoice}) {
 
     switch (choice) {
-      case "Add Level":
-        Navigator.of(context).pushNamed('/addLevel');
+      case "Themes Creator":
+        Navigator.of(context).push(new ThemesCreatorPageRoute());
         break;
 
       case "Achievements":
-        Navigator.of(context).pushNamed('/achievements');
+        Navigator.of(context).push(new AchievementsPageRoute());
         break;
 
       default:
@@ -453,7 +450,7 @@ class AnimatedHomeState extends State<AnimatedHome> with TickerProviderStateMixi
               );
             }
         ));*/
-      //Navigator.of(context).push(new SecondPageRoute());
+        //Navigator.of(context).push(new SecondPageRoute(5));
         print("Alert Choice: $alertChoice");
         print('Mode: $choice');
         if (choice == "Party Mode") {
@@ -467,21 +464,8 @@ class AnimatedHomeState extends State<AnimatedHome> with TickerProviderStateMixi
           }
           alertChoice = numTeams;
         }
-        Navigator.of(context, rootNavigator: true).push(
-            new CupertinoPageRoute<bool>(
-              //in ios a fullScreenDialog is a new page that comes in from the bottom and comes up and is designed
-              //to be exited with an x in the top left. Setting fullscreendialog to true does a cupertino
-              //bottom to top animation, else it does an ios-typical left to right transition
-              fullscreenDialog: false,
-              builder: (BuildContext context) => new ThemeSelectPage(title: "Hello", alertChoice: alertChoice, mode: choice),
-            )
-        );
+        Navigator.of(context).push(new ThemeSelectRoute(alertChoice, choice));
     }
   }
 }
 
-class SecondPageRoute extends CupertinoPageRoute {
-  SecondPageRoute()
-      : super(builder: (BuildContext context) => new ModeSelectPage(title: "hello"));
-
-}

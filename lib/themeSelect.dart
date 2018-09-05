@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 
 import 'query.dart';
+import 'routes.dart';
 import 'customWidgets.dart';
 
 class ThemeSelectPage extends StatefulWidget {
@@ -34,11 +35,11 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
 
   //The following code instantiates my customThemesMap
   Map customThemesMap = {};
-  List<String> customLevelTitles;
+  List<String> customThemeTitles;
   getSharedPrefs() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    customLevelTitles = prefs.getStringList("CustomLevels") ?? [];
-    customLevelTitles.forEach((title) {
+    customThemeTitles = prefs.getStringList("CustomThemes") ?? [];
+    customThemeTitles.forEach((title) {
       customThemesMap[title] = prefs.getStringList(title);
     });
     setState(() {
@@ -47,8 +48,8 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
   }
   @override
   void initState() {
-    super.initState();
     getSharedPrefs();
+    super.initState();
   }
 
   List<String> randomWordsList;
@@ -65,9 +66,12 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
     _getKeys(customThemesMap)
     ];
 
-    return new SimpleScaffold(
-      title: 'Flutter Sticky Header example',
-      child: new Builder(builder: (BuildContext context) {
+    return new Scaffold(
+      appBar: new AppBar(
+        title: Text(widget.title),
+        backgroundColor: Colors.blue,
+      ),
+      body: new Builder(builder: (BuildContext context) {
         return new CustomScrollView(slivers: _buildSlivers(context));
       }),
     );
@@ -162,11 +166,11 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
     switch (headings[headingIndex]) {
       case "Themed Levels": {
         Navigator.of(context).push(
-            new MaterialPageRoute(
-                builder: (context) {
-                  return new QueryPage(title: myLists[headingIndex][index], terms: myThemesMap[myLists[headingIndex][index]], mode: mode, alertChoice: alertChoice);
-                }
-            )
+          new QueryPageRoute(
+              title: myLists[headingIndex][index],
+              terms: myThemesMap[myLists[headingIndex][index]],
+              mode: mode,
+              alertChoice: alertChoice)
         );
         break;
       }

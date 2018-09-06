@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'dart:async';
 
 import 'fontStyles.dart';
 
@@ -30,7 +31,7 @@ class _AboutPageState extends State<AboutPage> {
 
     Map<String,String> headingsToContent = {
       'How to Play':
-        "• Trends With Friends is a game inspired by the 'Google Trends Show' web series.\n"
+        "• Trends With Friends is a game inspired by the Google Trends Show web series.\n"
         "• Each game consists of multiple rounds.\n"
         "• In each round you will be given a word, you will then need to think of a word that people google with the given word.\n"
         "• Your word and the given word will then be combined to become your query.\n"
@@ -46,7 +47,7 @@ class _AboutPageState extends State<AboutPage> {
         "you will likely only score 1 point out of a possible 100."
         "\nGranted, Super Bowl even in June is often searched more than other popular 'Super' queries like "
         "'Super Food', 'Super Man', or 'Super Mario' and so you will likely still win the round but only by 1 point.\n"
-        "• Also, please note that:\n"
+        "• Additional Tips:\n"
         "1 - You can enter more that one word that will be combined with the given word to make up your query."
         " However, this can only worsen your score. For example, 'Super Bowl Football' will never have a higher score than 'Super Bowl'.\n"
         "2 - Word order and capitalisation don't matter. The phrase 'Super Bowl' and 'bowl super' will both return the same scores.",
@@ -108,8 +109,85 @@ class CustomExpansionTileState extends State<CustomExpansionTile> {
     return returnedVal;
   }
 
+  Future<Null> _launched;
+
+  Future<Null> _launchInBrowser(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url, forceSafariVC: false, forceWebView: false);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+  Future<Null> _launchInWebViewOrVC(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url, forceSafariVC: true, forceWebView: true);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+  Widget _launchStatus(BuildContext context, AsyncSnapshot<Null> snapshot) {
+    if (snapshot.hasError) {
+      return new Text('Error: ${snapshot.error}');
+    } else {
+      return const Text('');
+    }
+  }
+
   Widget _buildTiles(Entry root) {
-    if (root.children.isEmpty) return ListTile(title: Text(root.title));
+    if (root.children.isEmpty) {
+      if (root.title.contains('Google Trends Show')) {
+        List<String> strings = root.title.split('Google Trends Show');
+        List<TextSpan> textspans = [];
+        for (int i=0; i<strings.length; i++) {
+          textspans.add(
+            new TextSpan(
+              text: strings[i],
+              style: new TextStyle(
+                color: Colors.black,
+                fontSize: 16.0, fontWeight:
+                FontWeight.w400
+              ),
+            )
+          );
+          if (i < strings.length-1) {
+            textspans.add(
+              new TextSpan(
+                text: 'Google Trends Show',
+                style: new TextStyle(
+                    color: Colors.blue,
+                    fontSize: 16.0, fontWeight:
+                FontWeight.w400,
+                    decoration: TextDecoration.underline
+                ),
+                recognizer: new TapGestureRecognizer()
+                  ..onTap = () => setState(() {
+                    _launched = _launchInWebViewOrVC('https://www.youtube.com/watch?v=n9bqcK-nVRk&t=120s');
+                  }),
+              ),
+            );
+          }
+        }
+        return new ListTile(
+          title: RichText(
+            text: new TextSpan(
+                children: textspans
+            ),
+          ),
+        );
+      } else {
+        return ListTile(
+            title: Text(root.title,
+            style: new TextStyle(
+              color: Colors.black,
+              fontSize: 16.0,
+              fontWeight: FontWeight.w400
+            ),
+          )
+        );
+      }
+    }
     bool isInitiallyExpanded = _isInitiallyExpanded(root.title);
     return ExpansionTile(
       key: PageStorageKey<Entry>(root),
@@ -122,7 +200,28 @@ class CustomExpansionTileState extends State<CustomExpansionTile> {
         ),
       ),
       children: root.children.map(_buildTiles).toList(),
-      //children: [Text(root.children[0].title)],
+      /*children: [
+        Text(root.children[0].title),
+        new RichText(
+          text: new TextSpan(
+            children: [
+              new TextSpan(
+                text: 'This is no Link, ',
+                style: new TextStyle(color: Colors.black),
+              ),
+              new TextSpan(
+                text: 'but this is',
+                style: new TextStyle(color: Colors.blue),
+                recognizer: new TapGestureRecognizer()
+                  ..onTap = () => setState(() {
+                    _launched = _launchInWebViewOrVC('https://www.youtube.com/watch?v=n9bqcK-nVRk&t=120s');
+                  }),
+              ),
+            ],
+          ),
+        ),
+        new FutureBuilder<Null>(future: _launched, builder: _launchStatus),
+      ],*/
       onExpansionChanged: (bool expanding) => setState(() {
         isInitiallyExpanded ? (isExpandedAgain = expanding) : (isExpanded = expanding);
       }),

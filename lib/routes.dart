@@ -5,6 +5,7 @@ import 'dart:async';
 import 'themeSelect.dart';
 import 'query.dart';
 import 'result.dart';
+import 'finalScore.dart';
 import 'about.dart';
 import 'achievements.dart';
 import 'themesCreator.dart';
@@ -26,17 +27,25 @@ class QueryPageRoute extends CupertinoPageRoute {
   final Future<List<String>> futureTerms;
   final String mode;
   final dynamic alertChoice;
+  final String isRandomTheme;
 
-  QueryPageRoute({@required this.title, this.terms, this.futureTerms, @required this.mode, @required this.alertChoice})
+  QueryPageRoute({@required this.title, this.terms, this.futureTerms, @required this.mode, @required this.alertChoice, this.isRandomTheme})
       : super(
-    builder: (BuildContext context) => new QueryPage(
-      title: title,
-      terms: terms,
-      futureTerms: futureTerms,
-      mode: mode,
-      alertChoice: alertChoice,
-    ),
-  );
+    //WillPopScope stops the swipe left to go back feature
+    builder: (BuildContext context) => new WillPopScope(
+        onWillPop: () async {
+          return false;
+        },
+        child: new QueryPage(
+          title: title,
+          terms: terms,
+          futureTerms: futureTerms,
+          mode: mode,
+          alertChoice: alertChoice,
+          isRandomTheme: isRandomTheme
+        ),
+      )
+    );
 }
 
 class ResultsPageRoute extends CupertinoPageRoute {
@@ -46,6 +55,7 @@ class ResultsPageRoute extends CupertinoPageRoute {
   final String term;
   final String mode;
   final dynamic alertChoice;
+  final String isRandomTheme;
 
   ResultsPageRoute(
       this.queries,
@@ -53,7 +63,8 @@ class ResultsPageRoute extends CupertinoPageRoute {
       this.previousResults,
       this.term,
       this.mode,
-      this.alertChoice
+      this.alertChoice,
+      this.isRandomTheme
   ) : super(
     builder: (BuildContext context) => new ResultsPage(
         title: 'Results',
@@ -62,9 +73,31 @@ class ResultsPageRoute extends CupertinoPageRoute {
         previousResults: previousResults,
         term: term,
         mode: mode,
-        alertChoice: alertChoice
+        alertChoice: alertChoice,
+        isRandomTheme: isRandomTheme
     ),
     fullscreenDialog: true
+  );
+}
+
+class FinalScorePageRoute extends CupertinoPageRoute {
+  final String title;
+  final List<int> scores;
+  final String mode;
+  final String isRandomTheme;
+
+  FinalScorePageRoute({
+    @required this.title,
+    @required this.scores,
+    @required this.mode,
+    @required this.isRandomTheme
+  }) : super(
+    builder: (BuildContext context) => new FinalScorePage(
+      title: title,
+      scores: scores,
+      mode: mode,
+      isRandomTheme: isRandomTheme
+    ),
   );
 }
 
@@ -86,7 +119,7 @@ class ThemesCreatorPageRoute extends CupertinoPageRoute {
   ThemesCreatorPageRoute()
     : super(
       builder: (BuildContext context) => new AddThemePage(title: "Custom Themes"),
-    settings: RouteSettings(name: "/ThemesCreator")
+      settings: RouteSettings(name: "/ThemesCreator")
 );
 }
 

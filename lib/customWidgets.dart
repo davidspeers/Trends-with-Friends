@@ -24,6 +24,7 @@ Widget homeIcon(BuildContext context) {
   return new IconButton(
     icon: backIcon,
     onPressed: () {
+      FocusScope.of(context).requestFocus(new FocusNode()); //Removes keyboard before going back
       Navigator.popUntil(context, ModalRoute.withName('/'));
     }
   );
@@ -117,6 +118,18 @@ Widget verticalAlertLayout(List<Widget> widgets) {
     mainAxisSize: MainAxisSize.min,
     children: widgets,
   );
+}
+
+void createSnackBar(String text, BuildContext context) {
+  final snackBar = SnackBar(
+    content: Text(
+      text,
+      textAlign: TextAlign.center,
+    ),
+    duration: const Duration(seconds: 3),
+  );
+
+  Scaffold.of(context).showSnackBar(snackBar);
 }
 
 class SimpleScaffold extends StatelessWidget {

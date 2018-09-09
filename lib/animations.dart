@@ -1,7 +1,7 @@
 import 'package:flutter/animation.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'globalVals.dart';
+import 'globals.dart';
 
 class LinesPainter extends CustomPainter {
   final Animation<double> _animation;

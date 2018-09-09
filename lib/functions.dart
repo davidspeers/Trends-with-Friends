@@ -32,3 +32,10 @@ int randomRange(int min, int max) => min + _random.nextInt(max - min);
 double randomDouble(double max) => _random.nextInt(max.toInt()).toDouble();
 ///From min inclusive to max exclusive
 double randomDoubleRange(double min, double max) => (min + randomDouble(max - min)).toDouble();
+
+///Get Random Key From Map
+randomKey(Map map) => map.keys.elementAt(_random.nextInt(map.length));
+
+randomValFromMap(Map map) => map.values.elementAt(_random.nextInt(map.length));
+
+randomValFromList(List list) => list[_random.nextInt(list.length)];

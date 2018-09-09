@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'finalScore.dart';
 import 'functions.dart';
 import 'fontStyles.dart';
+import 'routes.dart';
 
 import 'dart:async';
 import 'dart:convert';
@@ -60,7 +61,7 @@ Future<Post> fetchPost(String mode, var alertChoice, String term, List<String> q
 
 class ResultsPage extends StatefulWidget {
   //Note: the curly braces means the values are optional and that you have to do key:value when specifying
-  ResultsPage({Key key, this.title, this.queries, this.lastQuery, this.previousResults, this.term, this.mode, this.alertChoice}) : super(key: key);
+  ResultsPage({Key key, this.title, this.queries, this.lastQuery, this.previousResults, this.term, this.mode, this.alertChoice, this.isRandomTheme}) : super(key: key);
 
   final String title;
   final List<String> queries;
@@ -69,6 +70,7 @@ class ResultsPage extends StatefulWidget {
   final String term;
   final String mode;
   final dynamic alertChoice;
+  final String isRandomTheme;
 
   @override
   _ResultsPageState createState() => new _ResultsPageState();
@@ -130,11 +132,12 @@ class _ResultsPageState extends State<ResultsPage> {
 
   void _pushFinalScore(List<int> results) {
     Navigator.of(context).push(
-        new MaterialPageRoute(
-            builder: (context) {
-              return new FinalScorePage(title: "Hello", scores: results, mode: widget.mode);
-            }
-        )
+      new FinalScorePageRoute(
+        title: "Hello",
+        scores: results,
+        mode: widget.mode,
+        isRandomTheme: widget.isRandomTheme,
+      )
     );
   }
 

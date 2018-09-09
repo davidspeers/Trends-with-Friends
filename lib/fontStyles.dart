@@ -31,9 +31,9 @@ final blackTextSmall = new TextStyle(
     fontSize: 10.0
 ).apply(fontSizeFactor: 2.0);
 
-final greyTextSmall = new TextStyle(
+final greyTextSmaller = new TextStyle(
     color: Colors.grey,
-    fontSize: 10.0
+    fontSize: 8.0
 ).apply(fontSizeFactor: 2.0);
 
 TextStyle customFont({@required Color color, @required double fontsize}) {

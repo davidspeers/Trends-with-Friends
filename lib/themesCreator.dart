@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 //Note: the enums are located in this file
 import 'themesEditor.dart';
 
+import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
+import 'customWidgets.dart';
 import 'routes.dart';
 
 class AddThemePage extends StatefulWidget {
@@ -18,6 +21,34 @@ class AddThemePage extends StatefulWidget {
 
 class _AddThemePageState extends State<AddThemePage> {
   List<String> items = [];
+  BuildContext _scaffoldContext;
+
+  updateAchievements() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool isTrendSetter = prefs.getBool('Trends Setter') ?? false;
+    bool isProTrendSetter = prefs.getBool('Pro Trends Setter') ?? false;
+    if (!(isTrendSetter && isProTrendSetter)) {
+      int numCreatedThemes = prefs.getInt("Number of Created Themes") ?? 0;
+      numCreatedThemes++;
+      if (numCreatedThemes == 1 && !isTrendSetter) {
+        prefs.setBool('Trends Setter', true);
+        createSnackBar('Achievement Unlocked -\nTrends Setter', _scaffoldContext);
+      } else if (numCreatedThemes == 5 && !isProTrendSetter) {
+        prefs.setBool('Pro Trends Setter', true);
+        createSnackBar('Achievement Unlocked -\nPro Trends Setter', _scaffoldContext);
+      } else {
+        Fluttertoast.showToast(
+            msg: "Theme Saved",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIos: 1,
+            bgcolor: "#e74c3c",
+            textcolor: '#ffffff'
+        );
+      }
+      prefs.setInt("Number of Created Themes", numCreatedThemes);
+    }
+  }
 
   getSharedPrefs() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -90,21 +121,30 @@ class _AddThemePageState extends State<AddThemePage> {
         actions: <Widget>[
           FlatButton(
             child: Text("Add Theme"),
-            onPressed: () => _pushThemeEditor(themeEditType: ThemeEditingTypes.add),
+            onPressed: () async {
+              bool isNewThemeAdded = await _pushThemeEditor(themeEditType: ThemeEditingTypes.add) ?? false; //null unless Save Theme was pressed
+              if (isNewThemeAdded) {
+                await getSharedPrefs();
+                updateAchievements();
+              }
+            }
           )
         ],
       ),
-      body: new Container(
-          padding: const EdgeInsets.all(10.0),
-          child: new Column(
-              children: <Widget>[
-                new Expanded(
-                    child: themesList
-                )
+      body: new Builder(builder: (BuildContext context) {
+        _scaffoldContext = context;
+        return new Container(
+            padding: const EdgeInsets.all(10.0),
+            child: new Column(
+                children: <Widget>[
+                  new Expanded(
+                      child: themesList
+                  )
 
-              ]
-          )
-      ),
+                ]
+            )
+        );
+      })
     );
   }
 
@@ -153,7 +193,7 @@ class _AddThemePageState extends State<AddThemePage> {
     setSharedPrefs(chosenTheme, choice);
   }
 
-  void _pushThemeEditor({ThemeEditingTypes themeEditType, String themeTitle}) {
+  Future _pushThemeEditor({ThemeEditingTypes themeEditType, String themeTitle}) {
     /*setState(() {
       for (int i = 0; i < 3; i++) {
         items.add(
@@ -161,14 +201,20 @@ class _AddThemePageState extends State<AddThemePage> {
         );
       }
     });*/
+    //Making this a future and returning is here to check if we've added a new Theme
+    //and so need to update the list
+    //Returns either true, false, or null. We only do anything if adding a theme.
+    //And even then only if they pressed Save Theme.
     switch (themeEditType) {
       case (ThemeEditingTypes.add): {
-        Navigator.of(context).push(ThemesEditorPageRoute(themeEditingType: themeEditType, existingThemes: items));
-        break;
+        return Navigator.of(context).push(
+            ThemesEditorPageRoute(themeEditingType: themeEditType, existingThemes: items)
+        );
       }
       case (ThemeEditingTypes.edit): {
-        Navigator.of(context).push(ThemesEditorPageRoute(themeEditingType: themeEditType, existingThemes: items, themeTitle: themeTitle));
-        break;
+        return Navigator.of(context).push(
+            ThemesEditorPageRoute(themeEditingType: themeEditType, existingThemes: items, themeTitle: themeTitle)
+        );
       }
       default: {
         print("Error - ThemeEditingType of wrong type (probably null)");

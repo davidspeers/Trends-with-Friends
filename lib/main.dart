@@ -15,7 +15,7 @@ import 'fontStyles.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'animations.dart';
-import 'globalVals.dart';
+import 'globals.dart';
 
 import 'routes.dart';
 

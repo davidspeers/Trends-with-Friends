@@ -8,6 +8,7 @@ import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'query.dart';
 import 'routes.dart';
 import 'customWidgets.dart';
+import 'functions.dart';
 
 class ThemeSelectPage extends StatefulWidget {
   ThemeSelectPage({Key key, this.title, this.alertChoice, this.mode, this.teamName, this.roomName}) : super(key: key);
@@ -62,7 +63,7 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
     //Non-static initialisation
     myLists = [
     _getKeys(myThemesMap),
-    ["Random Words", "Random Theme", "Random Custom", "Randomised Theme", "Randomised Custom"],
+    ["Random Nouns", "Random Show Theme", "Random Words From Show Themes", "Random Custom Theme", "Random Words From Custom Themes"],
     _getKeys(customThemesMap)
     ];
 
@@ -167,10 +168,11 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
       case "Themed Levels": {
         Navigator.of(context).push(
           new QueryPageRoute(
-              title: myLists[headingIndex][index],
-              terms: myThemesMap[myLists[headingIndex][index]],
-              mode: mode,
-              alertChoice: alertChoice)
+            title: myLists[headingIndex][index],
+            terms: myThemesMap[myLists[headingIndex][index]],
+            mode: mode,
+            alertChoice: alertChoice
+          )
         );
         break;
       }
@@ -178,23 +180,91 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
         //Note the importance of not calling the getRandomWords function inside
         //the Navigator.of because it is called every time the keyboard appears and disappears
         //(or device orientation etc.)
-        Future<List<String>> randomWords = getRandomWords();
-        Navigator.of(context).push(
-            new MaterialPageRoute(
-                builder: (context) {
-                  return new QueryPage(title: myLists[headingIndex][index], futureTerms: randomWords, mode: mode, alertChoice: alertChoice);
-                }
-            )
-        );
+        switch (myLists[headingIndex][index]) {
+          case 'Random Nouns': {
+            Future<List<String>> randomWords = getRandomWords();
+            Navigator.of(context).push(
+              new QueryPageRoute(
+                title: myLists[headingIndex][index],
+                futureTerms: randomWords,
+                mode: mode, alertChoice:
+                alertChoice,
+                isRandomTheme: myLists[headingIndex][index]
+              )
+            );
+            break;
+          }
+          case 'Random Show Theme': {
+            String randomTheme = randomKey(myThemesMap);
+            Navigator.of(context).push(
+              new QueryPageRoute(
+                title: randomTheme,
+                terms: myThemesMap[randomTheme],
+                mode: mode,
+                alertChoice: alertChoice,
+                isRandomTheme: myLists[headingIndex][index]
+              )
+            );
+            break;
+          }
+          case 'Random Words From Show Themes': {
+            List<String> randomWords = [];
+            for (int i=0; i<8; i++) {
+              List<String> randomValues = randomValFromMap(myThemesMap);
+              randomWords.add(randomValFromList(randomValues));
+            }
+            Navigator.of(context).push(
+                new QueryPageRoute(
+                    title: 'Random Show Words',
+                    terms: randomWords,
+                    mode: mode,
+                    alertChoice: alertChoice,
+                    isRandomTheme: myLists[headingIndex][index]
+                )
+            );
+            break;
+          }
+          case 'Random Custom Theme': {
+            String randomTheme = randomKey(customThemesMap);
+            Navigator.of(context).push(
+                new QueryPageRoute(
+                    title: randomTheme,
+                    terms: customThemesMap[randomTheme],
+                    mode: mode,
+                    alertChoice: alertChoice,
+                    isRandomTheme: myLists[headingIndex][index]
+                )
+            );
+            break;
+          }
+          case 'Random Words From Custom Themes': {
+            List<String> randomWords = [];
+            for (int i=0; i<8; i++) {
+              List<String> randomValues = randomValFromMap(customThemesMap);
+              randomWords.add(randomValFromList(randomValues));
+            }
+            Navigator.of(context).push(
+                new QueryPageRoute(
+                    title: 'Random Custom Words',
+                    terms: randomWords,
+                    mode: mode,
+                    alertChoice: alertChoice,
+                    isRandomTheme: myLists[headingIndex][index]
+                )
+            );
+            break;
+          }
+        }
         break;
       }
       case "Custom Levels": {
         Navigator.of(context).push(
-            new MaterialPageRoute(
-                builder: (context) {
-                  return new QueryPage(title: myLists[headingIndex][index], terms: customThemesMap[myLists[headingIndex][index]], mode: mode, alertChoice: alertChoice);
-                }
-            )
+          new QueryPageRoute(
+            title: myLists[headingIndex][index],
+            terms: customThemesMap[myLists[headingIndex][index]],
+            mode: mode,
+            alertChoice: alertChoice
+          )
         );
         break;
       }

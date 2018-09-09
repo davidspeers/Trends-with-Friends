@@ -74,11 +74,13 @@ class _AboutPageState extends State<AboutPage> {
       /*body: new ListView(
         children: myChildren
       ),*/
-      body: new ListView.builder(
-        itemBuilder: (BuildContext context, int index) =>
-            CustomExpansionTile(myChildren[index]),
-        itemCount: myChildren.length,
-      ),
+      body: SafeArea(
+        child: new ListView.builder(
+          itemBuilder: (BuildContext context, int index) =>
+          CustomExpansionTile(myChildren[index]),
+          itemCount: myChildren.length,
+        ),
+      )
     );
   }
 }
@@ -163,7 +165,7 @@ class CustomExpansionTileState extends State<CustomExpansionTile> {
                 ),
                 recognizer: new TapGestureRecognizer()
                   ..onTap = () => setState(() {
-                    _launched = _launchInWebViewOrVC('https://www.youtube.com/watch?v=n9bqcK-nVRk&t=120s');
+                    _launched = _launchInBrowser('https://www.youtube.com/watch?v=n9bqcK-nVRk&t=120s');
                   }),
               ),
             );

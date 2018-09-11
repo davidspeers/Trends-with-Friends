@@ -5,17 +5,14 @@ import 'package:flutter/material.dart';
 
 import 'functions.dart';
 
-import 'themesCreator.dart';
-import 'achievements.dart';
-import 'about.dart';
-import 'themeSelect.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'fontStyles.dart';
 
 import 'package:flutter/cupertino.dart';
 
 import 'animations.dart';
-import 'globals.dart';
+import 'globals.dart' as globals;
 
 import 'routes.dart';
 
@@ -23,6 +20,16 @@ String txt = "If this is your first time playing Trends With Friends - welcome..
     "or you've never used GT before we recommend you press the ? and read the How To Play section";
 
 void main() => runApp(new MyApp());
+
+//Adding this as a behaviour removes the default blue glow when overscrolling a ListView on android.
+//Then I can add my own custom color without it mixing with the blue. Using GlowingOverscrollIndicator
+class removeListGlowingOverscroll extends ScrollBehavior {
+  @override
+  Widget buildViewportChrome(
+      BuildContext context, Widget child, AxisDirection axisDirection) {
+    return child;
+  }
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -32,6 +39,12 @@ class MyApp extends StatelessWidget {
     //print(x.scaffoldBackgroundColor);
     return new MaterialApp(
       title: 'Google Trends Game',
+      builder: (context, child) {
+        return ScrollConfiguration(
+          behavior: removeListGlowingOverscroll(),
+          child: child,
+        );
+      },
       theme: new ThemeData(
           primarySwatch: Colors.blue, primaryColor: new Color(0xffd05c6b)),
       home: new AnimatedHome(),
@@ -58,12 +71,49 @@ List<Color> myColors = [
 class AnimatedHomeState extends State<AnimatedHome> with TickerProviderStateMixin, WidgetsBindingObserver{
   AnimationController _controller;
 
+  //Tests Trendmaster Achievement unlock. Search for floatingactionbar to find function caller
+  /*List<String> allAchievements = [
+    //All Achievements, except final one
+    "My First Achievement",
+    "Trends Newbie",
+    "Trends Novice",
+    "Trends Pro",
+    "Trends with Friends",
+    "Peake Score",
+    "Quintessential Gamer",
+    "Trends Setter",
+    "Pro Trends Setter",
+    "Trends Getter",
+    "Complete the Show",
+    "Same Choice, Different Outcome",
+    "Beat the Machine",
+    "Beat the Harder Machine",
+    "Beat the Hardest Machine",
+  ];
+  unlockAllAchievements() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    allAchievements.forEach((string) => prefs.setBool(string, true));
+  }*/
+
   ///Main State Var Inits
   //You had to do this weird global thing because variables in stackButton seemed to being reset to initial values
   Map<String,int> modeToChoiceIndexMap = {
     'Party Mode': 0,
     'CPU Mode': 1
   };
+
+  getSharedPrefs() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    modeToChoiceIndexMap['Party Mode'] = prefs.getInt('numPlayers') ?? 0;
+    modeToChoiceIndexMap['CPU Mode'] = prefs.getInt('difficulty') ?? 1;
+  }
+
+  setSharedPrefs() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setInt('numPlayers',  modeToChoiceIndexMap['Party Mode']);
+    prefs.setInt('difficulty', modeToChoiceIndexMap['CPU Mode']);
+  }
+
   //Color scheme 1A
   //Color mainButtonColor = Colors.yellow[200];
   //Color secondaryButtonColor = Colors.green;
@@ -163,7 +213,7 @@ class AnimatedHomeState extends State<AnimatedHome> with TickerProviderStateMixi
     print(_screenHeight);
     while (true) {
       _controller.reset();
-      globalLines = [];
+      globals.globalLines = [];
       int numberOfPoints = randomRange(4, 6);
       double maximumChange = _screenHeight/4;
       double yMin;
@@ -199,7 +249,7 @@ class AnimatedHomeState extends State<AnimatedHome> with TickerProviderStateMixi
             );
           }
         }
-        globalLines.add(new Line(
+        globals.globalLines.add(new globals.Line(
             points,
             myColors[i]
         ));
@@ -244,6 +294,13 @@ class AnimatedHomeState extends State<AnimatedHome> with TickerProviderStateMixi
         painter: new LinesPainter(_controller),
         child: _homePageUI(),
       ),
+      /*Test Achievement Unlocking
+      floatingActionButton: new FloatingActionButton(
+        onPressed: () {
+          unlockAllAchievements();
+        },
+        child: new Icon(Icons.title),
+      )*/
     );
   }
 
@@ -264,7 +321,7 @@ class AnimatedHomeState extends State<AnimatedHome> with TickerProviderStateMixi
       }
       case "CPU Mode": {
         selectionTextHeading = "Difficulty:";
-        listChoices = ['Easy', 'Normal', 'Hard', ' Impossible'];
+        listChoices = ['Easy', 'Normal', 'Hard', 'Impossible'];
         choiceFontSize = 14.0;
         myColor = cpuButtonBg;
         break;
@@ -463,6 +520,26 @@ class AnimatedHomeState extends State<AnimatedHome> with TickerProviderStateMixi
             case '5': {numTeams = 5; break;}
           }
           alertChoice = numTeams;
+          globals.cpuDifficulty = 0;
+        } else if (choice == "CPU Mode") {
+          switch (alertChoice) {
+            case 'Easy': {
+              globals.cpuDifficulty = 1;
+              break;
+            }
+            case 'Normal': {
+              globals.cpuDifficulty = 2;
+              break;
+            }
+            case 'Hard': {
+              globals.cpuDifficulty = 3;
+              break;
+            }
+            case 'Impossible': {
+              globals.cpuDifficulty = 4;
+              break;
+            }
+          }
         }
         Navigator.of(context).push(new ThemeSelectRoute(alertChoice, choice));
     }

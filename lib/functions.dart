@@ -29,7 +29,15 @@ var _random = new Random();
 ///From min inclusive to max exclusive
 int randomRange(int min, int max) => min + _random.nextInt(max - min);
 ///From 0 inclusive to max exclusive
-double randomDouble(double max) => _random.nextInt(max.toInt()).toDouble();
+double randomDouble(double max) {
+  //Got an error in the past where max was -150 and animations didn't occur
+  //It said is was a range error and max needed to be between 1 and 2^32
+  if (max >= 1.0) {
+    return _random.nextInt(max.toInt()).toDouble();
+  } else {
+    return 1.0;
+  }
+}
 ///From min inclusive to max exclusive
 double randomDoubleRange(double min, double max) => (min + randomDouble(max - min)).toDouble();
 

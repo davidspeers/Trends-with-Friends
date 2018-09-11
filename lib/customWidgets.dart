@@ -132,6 +132,19 @@ void createSnackBar(String text, BuildContext context) {
   Scaffold.of(context).showSnackBar(snackBar);
 }
 
+void createInteractiveSnackBar(String text, BuildContext context, SnackBarAction SBAction) {
+  final snackBar = SnackBar(
+    content: Text(
+      text,
+      textAlign: TextAlign.center,
+    ),
+    duration: const Duration(seconds: 6),
+    action: SBAction,
+  );
+
+  Scaffold.of(context).showSnackBar(snackBar);
+}
+
 class SimpleScaffold extends StatelessWidget {
   const SimpleScaffold({
     Key key,

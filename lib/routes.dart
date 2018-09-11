@@ -27,9 +27,8 @@ class QueryPageRoute extends CupertinoPageRoute {
   final Future<List<String>> futureTerms;
   final String mode;
   final dynamic alertChoice;
-  final String isRandomTheme;
 
-  QueryPageRoute({@required this.title, this.terms, this.futureTerms, @required this.mode, @required this.alertChoice, this.isRandomTheme})
+  QueryPageRoute({@required this.title, this.terms, this.futureTerms, @required this.mode, @required this.alertChoice})
       : super(
     //WillPopScope stops the swipe left to go back feature
     builder: (BuildContext context) => new WillPopScope(
@@ -42,7 +41,6 @@ class QueryPageRoute extends CupertinoPageRoute {
           futureTerms: futureTerms,
           mode: mode,
           alertChoice: alertChoice,
-          isRandomTheme: isRandomTheme
         ),
       )
     );
@@ -55,7 +53,6 @@ class ResultsPageRoute extends CupertinoPageRoute {
   final String term;
   final String mode;
   final dynamic alertChoice;
-  final String isRandomTheme;
 
   ResultsPageRoute(
       this.queries,
@@ -64,7 +61,6 @@ class ResultsPageRoute extends CupertinoPageRoute {
       this.term,
       this.mode,
       this.alertChoice,
-      this.isRandomTheme
   ) : super(
     builder: (BuildContext context) => new ResultsPage(
         title: 'Results',
@@ -74,7 +70,6 @@ class ResultsPageRoute extends CupertinoPageRoute {
         term: term,
         mode: mode,
         alertChoice: alertChoice,
-        isRandomTheme: isRandomTheme
     ),
     fullscreenDialog: true
   );
@@ -84,19 +79,16 @@ class FinalScorePageRoute extends CupertinoPageRoute {
   final String title;
   final List<int> scores;
   final String mode;
-  final String isRandomTheme;
 
   FinalScorePageRoute({
     @required this.title,
     @required this.scores,
     @required this.mode,
-    @required this.isRandomTheme
   }) : super(
     builder: (BuildContext context) => new FinalScorePage(
       title: title,
       scores: scores,
       mode: mode,
-      isRandomTheme: isRandomTheme
     ),
   );
 }
@@ -132,7 +124,7 @@ class ThemesEditorPageRoute extends CupertinoPageRoute {
   ThemesEditorPageRoute({this.themeEditingType, this.themeTitle, this.existingThemes})
       : super(
       builder: (BuildContext context) => new ThemeEditorPage(
-        title: 'Editor',
+        title: 'Theme Editor',
         themeEditingType: themeEditingType,
         themeTitle: themeTitle,
         existingThemes: existingThemes,

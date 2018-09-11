@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 
 import 'customWidgets.dart';
 import 'fontStyles.dart';
+import 'globals.dart' as globals;
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class FinalScorePage extends StatefulWidget {
-  FinalScorePage({Key key, this.title, this.scores, this.mode, this.isRandomTheme}) : super(key: key);
+  FinalScorePage({Key key, this.title, this.scores, this.mode}) : super(key: key);
 
   final String title;
   final List<int> scores;
   final String mode;
-  final String isRandomTheme;
 
   @override
   _FinalScorePageState createState() => new _FinalScorePageState();
@@ -53,10 +53,55 @@ class _FinalScorePageState extends State<FinalScorePage> {
       }
     }
 
-    //Playing Custom Theme Achievements
+    //Checks Global Vals State
+    print(globals.isShowTheme);
+    print(globals.isRandomTheme);
+    print(globals.isCustomTheme);
+    print(globals.chosenThemeName);
+    print(globals.cpuDifficulty);
+
+    //If CPU Mode Achievements
+    bool isMachineBeater = prefs.getBool('Beat the Machine') ?? false;
+    bool isHardMachineBeater = prefs.getBool('Beat the Harder Machine') ?? false;
+    bool isHardestMachineBeater = prefs.getBool('Beat the Hardest Machine') ?? false;
+    if (!(isMachineBeater && isHardMachineBeater && isHardestMachineBeater)) {
+      if (globals.cpuDifficulty >= 1 && !isMachineBeater) {
+        prefs.setBool('Beat the Machine', true);
+        createSnackBar('Achievement Unlocked -\nBeat the Machine', _scaffoldContext);
+      }
+      if (globals.cpuDifficulty >=3 && !isHardMachineBeater) {
+        prefs.setBool('Beat the Harder Machine', true);
+        createSnackBar('Achievement Unlocked -\nBeat the Harder Machine', _scaffoldContext);
+      }
+      if (globals.cpuDifficulty == 4 && !isHardestMachineBeater) {
+        prefs.setBool('Beat the Hardest Machine', true);
+        createSnackBar('Achievement Unlocked -\nBeat the Hardest Machine', _scaffoldContext);
+      }
+    }
+
+    //If Custom Theme Achievements
+    bool isTrendsGetter = prefs.getBool('Trends Getter') ?? false;
+    if (!isTrendsGetter) {
+      if (globals.isCustomTheme) {
+        prefs.setBool('Trends Getter', true);
+        createSnackBar('Achievement Unlocked -\nTrends Getter', _scaffoldContext);
+      }
+    }
 
     //If Random Theme Achievements
-    print('Is Random Theme: ${widget.isRandomTheme}');
+    bool isRandomThemeX2 = prefs.getBool('Same Choice, Different Outcome') ?? false;
+    if (!isRandomThemeX2) {
+      if (globals.isRandomTheme) {
+        bool hasPlayedTheme = prefs.getBool(globals.chosenThemeName) ?? false;
+        if (!hasPlayedTheme) {
+          prefs.setBool(globals.chosenThemeName, true);
+        } else {
+          prefs.setBool('Same Choice, Different Outcome', true);
+          createSnackBar('Achievement Unlocked -\nSame Choice, Different Outcome', _scaffoldContext);
+        }
+      }
+    }
+
   }
 
   @override

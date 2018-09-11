@@ -24,3 +24,10 @@ class Line {
 }
 
 List<Line> globalLines = [];
+
+//The following are theme vals for achievement unlocking
+bool isShowTheme = false;
+bool isRandomTheme = false;
+bool isCustomTheme = false;
+String chosenThemeName = '';
+int cpuDifficulty = 0; // 0 => Party Mode (NA), 4 => Impossible

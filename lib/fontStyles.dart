@@ -31,6 +31,11 @@ final blackTextSmall = new TextStyle(
     fontSize: 10.0
 ).apply(fontSizeFactor: 2.0);
 
+final blackTextSmaller = new TextStyle(
+    color: Colors.black87,
+    fontSize: 9.0
+).apply(fontSizeFactor: 2.0);
+
 final greyTextSmaller = new TextStyle(
     color: Colors.grey,
     fontSize: 8.0

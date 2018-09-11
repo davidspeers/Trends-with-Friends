@@ -46,9 +46,9 @@ class _AboutPageState extends State<AboutPage> {
         " however, because google search traffic for the query 'Super Bowl' is about 1% of the search traffic in the lead-up to the Super Bowl,"
         "you will likely only score 1 point out of a possible 100."
         "\nGranted, Super Bowl even in June is often searched more than other popular 'Super' queries like "
-        "'Super Food', 'Super Man', or 'Super Mario' and so you will likely still win the round but only by 1 point.\n"
+        "'Super Food', 'Super Man', or 'Super Mario' and so you will likely still win the round, but only by 1 point.\n"
         "• Additional Tips:\n"
-        "1 - You can enter more that one word that will be combined with the given word to make up your query."
+        "1 - You can enter more than one word that will be combined with the given word to make up your query."
         " However, this can only worsen your score. For example, 'Super Bowl Football' will never have a higher score than 'Super Bowl'.\n"
         "2 - Word order and capitalisation don't matter. The phrase 'Super Bowl' and 'bowl super' will both return the same scores.",
       'Contact the Developer':
@@ -75,11 +75,12 @@ class _AboutPageState extends State<AboutPage> {
         children: myChildren
       ),*/
       body: SafeArea(
-        child: new ListView.builder(
-          itemBuilder: (BuildContext context, int index) =>
-          CustomExpansionTile(myChildren[index]),
-          itemCount: myChildren.length,
-        ),
+        child: GlowingOverscrollIndicator(axisDirection: AxisDirection.down, color: Colors.red,
+          child: new ListView.builder(
+            itemBuilder: (BuildContext context, int index) =>
+                CustomExpansionTile(myChildren[index]),
+            itemCount: myChildren.length,
+          ),),
       )
     );
   }

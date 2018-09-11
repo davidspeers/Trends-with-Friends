@@ -7,6 +7,7 @@ import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
+import 'fontStyles.dart';
 import 'customWidgets.dart';
 import 'routes.dart';
 
@@ -47,6 +48,15 @@ class _AddThemePageState extends State<AddThemePage> {
         );
       }
       prefs.setInt("Number of Created Themes", numCreatedThemes);
+    } else {
+      Fluttertoast.showToast(
+          msg: "Theme Saved",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIos: 1,
+          bgcolor: "#e74c3c",
+          textcolor: '#ffffff'
+      );
     }
   }
 
@@ -67,6 +77,11 @@ class _AddThemePageState extends State<AddThemePage> {
     }
   }
 
+  undoRemoveForSharedPrefs() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setStringList("CustomThemes", items);
+  }
+
   @override
   void initState() {
     getSharedPrefs();
@@ -80,47 +95,67 @@ class _AddThemePageState extends State<AddThemePage> {
 
   Widget _addThemePageUI() {
 
-    var themesList = new ListView.builder(
-      itemCount: items.length,
-      itemBuilder: (BuildContext context, item) {
-        return new SizedBox(
-          child: new Card(
-            child: new ListTile(
-              title: new Text(items[item]),
-              trailing: new PopupMenuButton<ListChoices>(
-                onSelected: (ListChoices result) { executeChoice(result, item); },
-                itemBuilder: (BuildContext context) => <PopupMenuEntry<ListChoices>>[
-                  const PopupMenuItem<ListChoices>(
-                    value: ListChoices.delete,
-                    child: const Text('Delete Theme'),
-                  ),
-                  const PopupMenuItem<ListChoices>(
-                    value: ListChoices.edit,
-                    child: const Text('Edit Theme'),
-                  ),
-                  const PopupMenuItem<ListChoices>(
-                    value: ListChoices.moveToTop,
-                    child: const Text('Move Theme to top of List'),
-                  ),
-                  const PopupMenuItem<ListChoices>(
-                    value: ListChoices.moveToBottom,
-                    child: const Text('Move Theme to bottom of List'),
-                  ),
-                ],
-              )
-            ),
+    var themesList;
+    if (items.isEmpty) {
+      themesList = Center(
+        child: Padding(
+          padding: EdgeInsets.all(5.0),
+          child: Text(
+            "To create a Custom Theme press the '+' symbol in the top-right corner",
+            textAlign: TextAlign.center,
+            style: blackTextSmall,
           ),
-        );
-      },
-    );
+        )
+      );
+    } else {
+      themesList = new GlowingOverscrollIndicator(
+          axisDirection: AxisDirection.down,
+          color: Colors.green,
+          child: new ListView.builder(
+            itemCount: items.length,
+            itemBuilder: (BuildContext context, item) {
+              return new SizedBox(
+                child: new Card(
+                  child: new ListTile(
+                      title: new Text(items[item]),
+                      trailing: new PopupMenuButton<ListChoices>(
+                        onSelected: (ListChoices result) { executeChoice(result, item); },
+                        itemBuilder: (BuildContext context) => <PopupMenuEntry<ListChoices>>[
+                          const PopupMenuItem<ListChoices>(
+                            value: ListChoices.delete,
+                            child: const Text('Delete Theme'),
+                          ),
+                          const PopupMenuItem<ListChoices>(
+                            value: ListChoices.edit,
+                            child: const Text('Edit Theme'),
+                          ),
+                          const PopupMenuItem<ListChoices>(
+                            value: ListChoices.moveToTop,
+                            child: const Text('Move Theme to top of List'),
+                          ),
+                          const PopupMenuItem<ListChoices>(
+                            value: ListChoices.moveToBottom,
+                            child: const Text('Move Theme to bottom of List'),
+                          ),
+                        ],
+                      )
+                  ),
+                ),
+              );
+            },
+            padding: EdgeInsets.all(5.0),
+          )
+      );
+    }
+
 
     return new Scaffold(
       appBar: new AppBar(
         title: new Text(widget.title),
         backgroundColor: Colors.green[400],
         actions: <Widget>[
-          FlatButton(
-            child: Text("Add Theme"),
+          IconButton(
+            icon: Icon(Icons.add),
             onPressed: () async {
               bool isNewThemeAdded = await _pushThemeEditor(themeEditType: ThemeEditingTypes.add) ?? false; //null unless Save Theme was pressed
               if (isNewThemeAdded) {
@@ -133,16 +168,12 @@ class _AddThemePageState extends State<AddThemePage> {
       ),
       body: new Builder(builder: (BuildContext context) {
         _scaffoldContext = context;
-        return new Container(
-            padding: const EdgeInsets.all(10.0),
-            child: new Column(
-                children: <Widget>[
-                  new Expanded(
-                      child: themesList
-                  )
-
-                ]
+        return new Column(
+          children: <Widget>[
+            new Expanded(
+              child: themesList
             )
+          ]
         );
       })
     );
@@ -153,9 +184,23 @@ class _AddThemePageState extends State<AddThemePage> {
     switch (choice) {
       case (ListChoices.delete): {
         //items.removeAt(itemNumber);
+        String removedItem = items[itemNumber];
         setState(() {
           items.removeAt(itemNumber);
         });
+        createInteractiveSnackBar(
+            'Theme Deleted',
+            _scaffoldContext,
+            SnackBarAction(
+              label: 'Undo',
+              onPressed: () {
+                setState(() {
+                  items.insert(itemNumber, removedItem);
+                });
+                undoRemoveForSharedPrefs();
+              },
+            )
+        );
         break;
       }
 

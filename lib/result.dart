@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'finalScore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'customWidgets.dart';
 import 'functions.dart';
 import 'fontStyles.dart';
 import 'routes.dart';
@@ -61,7 +63,7 @@ Future<Post> fetchPost(String mode, var alertChoice, String term, List<String> q
 
 class ResultsPage extends StatefulWidget {
   //Note: the curly braces means the values are optional and that you have to do key:value when specifying
-  ResultsPage({Key key, this.title, this.queries, this.lastQuery, this.previousResults, this.term, this.mode, this.alertChoice, this.isRandomTheme}) : super(key: key);
+  ResultsPage({Key key, this.title, this.queries, this.lastQuery, this.previousResults, this.term, this.mode, this.alertChoice}) : super(key: key);
 
   final String title;
   final List<String> queries;
@@ -70,7 +72,6 @@ class ResultsPage extends StatefulWidget {
   final String term;
   final String mode;
   final dynamic alertChoice;
-  final String isRandomTheme;
 
   @override
   _ResultsPageState createState() => new _ResultsPageState();
@@ -80,6 +81,52 @@ class _ResultsPageState extends State<ResultsPage> {
   final List<dynamic> colors = [Colors.blue, Colors.red, Colors.yellow, Colors.green, Colors.purple];
 
   List<int> results;
+
+  BuildContext _scaffoldContext;
+
+  updateAchievements(Post postData) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    bool hasPeakeScore = prefs.getBool('Peake Score') ?? false;
+    if (!hasPeakeScore) {
+      List<int> scores = postData.weeklyVals.last;
+      if (widget.mode == "CPU Mode") {
+        //Check First Only (Not CPU Answer)
+        if (scores[0] == 100) {
+          prefs.setBool('Peake Score', true);
+          createSnackBar('Achievement Unlocked -\nPeake Score', _scaffoldContext);
+        }
+      } else {
+        for (final score in scores) {
+          if (score == 100) {
+            prefs.setBool('Peake Score', true);
+            createSnackBar('Achievement Unlocked -\nPeake Score', _scaffoldContext);
+            break;
+          }
+        }
+      }
+    }
+
+    bool isQuintessential = prefs.getBool('Quintessential Gamer') ?? false;
+    if (!isQuintessential) {
+      List<int> totalScores = addLists(postData.weeklyVals.last, widget.previousResults);
+      if (widget.mode == "CPU Mode") {
+        //Check First Only (Not CPU Answer)
+        if (totalScores[0] >= 600) {
+          prefs.setBool('Quintessential Gamer', true);
+          createSnackBar('Achievement Unlocked -\nQuintessential Gamer', _scaffoldContext);
+        }
+      } else {
+        for (final score in totalScores) {
+          if (score >= 600) {
+            prefs.setBool('Quintessential Gamer', true);
+            createSnackBar('Achievement Unlocked -\nQuintessential Gamer', _scaffoldContext);
+            break;
+          }
+        }
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -94,7 +141,9 @@ class _ResultsPageState extends State<ResultsPage> {
     tabs.forEach((tabName) => myTabs.add(Tab(text: tabName))); //Tab widget can contain an Icon or a child not just text
 
     List<Widget> myTabContents = [];
-    tabs.forEach((tabName) => myTabContents.add(_buildFuturePostWidget(tabName))); //Tab widget can contain an Icon or a child not just text
+    //Need to get the future here because or else you'll call 3 post requests
+    Future fetchedPost = fetchPost(widget.mode, widget.alertChoice, widget.term, widget.queries);
+    tabs.forEach((tabName) => myTabContents.add(_buildFuturePostWidget(tabName, fetchedPost))); //Tab widget can contain an Icon or a child not just text
 
     return new DefaultTabController(
         length: tabs.length,
@@ -105,9 +154,12 @@ class _ResultsPageState extends State<ResultsPage> {
               ),
               title: Text('Fetch Data Example'),
             ),
-            body: TabBarView(
-              children: myTabContents,
-            ),
+            body: new Builder(builder: (BuildContext context) {
+              _scaffoldContext = context;
+              return new TabBarView(
+                children: myTabContents,
+              );
+            }),
             floatingActionButton: new FloatingActionButton(
               // When the user presses the button, show an alert dialog with the
               // text the user has typed into our text field.
@@ -123,7 +175,6 @@ class _ResultsPageState extends State<ResultsPage> {
                   }
                 }
               },
-              tooltip: 'Show me the value!',
               child: new Icon(Icons.send),
             )
         )
@@ -136,31 +187,40 @@ class _ResultsPageState extends State<ResultsPage> {
         title: "Hello",
         scores: results,
         mode: widget.mode,
-        isRandomTheme: widget.isRandomTheme,
       )
     );
   }
 
-  Widget _buildFuturePostWidget(String tabName) {
+  Widget _buildFuturePostWidget(String tabName, Future fetchedPost) {
     return new Center(
       child: new FutureBuilder<Post>(
-        future: fetchPost(widget.mode, widget.alertChoice, widget.term, widget.queries),
+        future: fetchedPost,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            results = snapshot.data.avgs;
+            updateAchievements(snapshot.data);
+            results = snapshot.data.weeklyVals.last; //DO NOT REMOVE - This variable is used elsewhere
             switch (tabName) {
               case ("Scores"): {
                 return _buildScoresTab(snapshot.data);
               }
-              case ("Past Scores"):{
-                return new TimeSeriesCallbackChart.withTrendsValues(
-                  snapshot.data.weeklyVals,
-                  snapshot.data.allDates,
-                  widget.queries
-                );
+              case ("Past Scores"): {
+                if (widget.mode == "Party Mode") {
+                  return new TimeSeriesCallbackChart.withTrendsValues(
+                      snapshot.data.weeklyVals,
+                      snapshot.data.allDates,
+                      widget.queries
+                  );
+                } else if (widget.mode == "CPU Mode") {
+                  return new TimeSeriesCallbackChart.withTrendsValues(
+                    snapshot.data.weeklyVals,
+                    snapshot.data.allDates,
+                    widget.queries + [(toTitleCase(snapshot.data.cpuAnswer))]
+                  );
+                }
+                break;
               }
               case ("Average"): {
-                return new SimpleBarChart.withGivenData(results);
+                return new SimpleBarChart.withGivenData(snapshot.data.avgs);
               }
               default: {
                 print("Error - 'tabName' doesn't match with any of the 'tabs' items");
@@ -192,7 +252,7 @@ class _ResultsPageState extends State<ResultsPage> {
   Widget _buildScoresTab(Post jsonResponse) {
     switch (widget.mode) {
       case ("Party Mode"): {
-        List<int> totals = addLists(widget.previousResults, jsonResponse.avgs);
+        List<int> totals = addLists(widget.previousResults, jsonResponse.weeklyVals.last);
         return new ListView.builder(
           itemBuilder: (context, index) {
             return new Container(
@@ -200,7 +260,7 @@ class _ResultsPageState extends State<ResultsPage> {
               child: ListTile(
                 title: new Text("Team ${index+1}:", style: whiteText,),
                 subtitle: new Text(
-                  "${widget.queries[index]}: ${jsonResponse.avgs[index].toString()}"
+                  "${widget.queries[index]}: ${jsonResponse.weeklyVals.last[index].toString()}"
                     "\nTotal: ${totals[index]}",
                   style: whiteTextSmall
                 ),
@@ -212,7 +272,7 @@ class _ResultsPageState extends State<ResultsPage> {
       }
 
       case ("CPU Mode"): {
-        List<int> totals = addLists(widget.previousResults, jsonResponse.avgs);
+        List<int> totals = addLists(widget.previousResults, jsonResponse.weeklyVals.last);
         List<String> messages = ["Your Answer:", "CPU Answer:"];
         List<String> allQueries = [widget.queries[0], toTitleCase(jsonResponse.cpuAnswer)];
         return new ListView.builder(
@@ -222,7 +282,7 @@ class _ResultsPageState extends State<ResultsPage> {
               child: ListTile(
                 title: new Text(messages[index], style: whiteText),
                 subtitle: new Text(
-                  "${allQueries[index]}: ${jsonResponse.avgs[index].toString()}"
+                  "${allQueries[index]}: ${jsonResponse.weeklyVals.last[index].toString()}"
                       "\nTotal: ${totals[index]}",
                   style: whiteTextSmall
                 ),

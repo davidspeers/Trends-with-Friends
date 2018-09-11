@@ -9,6 +9,7 @@ import 'query.dart';
 import 'routes.dart';
 import 'customWidgets.dart';
 import 'functions.dart';
+import 'globals.dart' as globals;
 
 class ThemeSelectPage extends StatefulWidget {
   ThemeSelectPage({Key key, this.title, this.alertChoice, this.mode, this.teamName, this.roomName}) : super(key: key);
@@ -166,6 +167,10 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
   void _pushGame(int headingIndex, int index, String mode, var alertChoice) {
     switch (headings[headingIndex]) {
       case "Themed Levels": {
+        globals.isShowTheme = true;
+        globals.isRandomTheme = false;
+        globals.isCustomTheme = false;
+        globals.chosenThemeName = myLists[headingIndex][index];
         Navigator.of(context).push(
           new QueryPageRoute(
             title: myLists[headingIndex][index],
@@ -177,6 +182,10 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
         break;
       }
       case "Random Levels": {
+        globals.isShowTheme = false;
+        globals.isRandomTheme = true;
+        globals.isCustomTheme = false;
+        globals.chosenThemeName = myLists[headingIndex][index];
         //Note the importance of not calling the getRandomWords function inside
         //the Navigator.of because it is called every time the keyboard appears and disappears
         //(or device orientation etc.)
@@ -189,7 +198,6 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
                 futureTerms: randomWords,
                 mode: mode, alertChoice:
                 alertChoice,
-                isRandomTheme: myLists[headingIndex][index]
               )
             );
             break;
@@ -202,7 +210,6 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
                 terms: myThemesMap[randomTheme],
                 mode: mode,
                 alertChoice: alertChoice,
-                isRandomTheme: myLists[headingIndex][index]
               )
             );
             break;
@@ -219,7 +226,6 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
                     terms: randomWords,
                     mode: mode,
                     alertChoice: alertChoice,
-                    isRandomTheme: myLists[headingIndex][index]
                 )
             );
             break;
@@ -232,7 +238,6 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
                     terms: customThemesMap[randomTheme],
                     mode: mode,
                     alertChoice: alertChoice,
-                    isRandomTheme: myLists[headingIndex][index]
                 )
             );
             break;
@@ -249,7 +254,6 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
                     terms: randomWords,
                     mode: mode,
                     alertChoice: alertChoice,
-                    isRandomTheme: myLists[headingIndex][index]
                 )
             );
             break;
@@ -258,6 +262,10 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
         break;
       }
       case "Custom Levels": {
+        globals.isShowTheme = false;
+        globals.isRandomTheme = false;
+        globals.isCustomTheme = true;
+        globals.chosenThemeName = myLists[headingIndex][index];
         Navigator.of(context).push(
           new QueryPageRoute(
             title: myLists[headingIndex][index],

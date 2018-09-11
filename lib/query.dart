@@ -11,14 +11,13 @@ import 'dart:async';
 
 
 class QueryPage extends StatefulWidget {
-  QueryPage({Key key, this.title, this.terms, this.futureTerms, this.mode, this.alertChoice, this.isRandomTheme}) : super(key: key);
+  QueryPage({Key key, this.title, this.terms, this.futureTerms, this.mode, this.alertChoice}) : super(key: key);
 
   final String title;
   final List<String> terms;
   final Future<List<String>> futureTerms;
   final String mode;
   final dynamic alertChoice;
-  final String isRandomTheme;
 
   @override
   _QueryPageState createState() => new _QueryPageState();
@@ -212,7 +211,6 @@ class _QueryPageState extends State<QueryPage> {
         convertedTerms[termIndex],
         widget.mode,
         widget.alertChoice,
-        widget.isRandomTheme ?? ''
       )
     );
   }

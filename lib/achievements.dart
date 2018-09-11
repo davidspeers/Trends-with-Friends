@@ -30,7 +30,7 @@ class _AchievementsPageState extends State<AchievementsPage> {
     ],
     [
       //All Achievements
-      "My First Achievement - Look at your achievements.",
+      "My First Achievement - Look at your achievements",
       "Trends Newbie - Play 1 Game",
       "Trends Novice - Play 10 Games",
       "Trends Pro - Play 100 Games",
@@ -41,8 +41,8 @@ class _AchievementsPageState extends State<AchievementsPage> {
       "Pro Trends Setter - Create 5 Custom Themes",
       "Trends Getter - Play a Custom Theme",
       "Complete the Show - Play Every Show Theme",
-      "Same Choice, Different Outcome - Play a random theme twice.",
-      "Beat the Machine  - Beat CPU mode",
+      "Same Choice, Different Outcome - Play a random theme twice",
+      "Beat the Machine - Beat CPU mode",
       "Beat the Harder Machine - Beat CPU mode on Hard Difficulty or harder",
       "Beat the Hardest Machine - Beat CPU mode on Impossible Difficulty",
       "Trendmaster - Unlock all other achievements",
@@ -56,18 +56,7 @@ class _AchievementsPageState extends State<AchievementsPage> {
     ]*/
   ];
 
-  //Initialising here and instantiating in the builder allows you to call
-  //the snackbar in code written outside the builder.
-  //Also, note that snackbars need scaffolds followed by a builder
   BuildContext _scaffoldContext;
-
-  final snackBar = SnackBar(
-    content: Text(
-      'Achievement Unlocked -\nMy First Achievement',
-      textAlign: TextAlign.center,
-    ),
-    duration: const Duration(seconds: 3),
-  );
 
   getSharedPrefs() async {
 
@@ -77,7 +66,7 @@ class _AchievementsPageState extends State<AchievementsPage> {
     bool isInitialised = prefs.getBool(initialAchievement) ?? false;
     if (!isInitialised) {
       prefs.setBool(initialAchievement, true);
-      Scaffold.of(_scaffoldContext).showSnackBar(snackBar);
+      createSnackBar('Achievement Unlocked -\nMy First Achievement', _scaffoldContext);
     }
 
     //Check which achievements have already been unlocked and add them to the correct list
@@ -93,6 +82,12 @@ class _AchievementsPageState extends State<AchievementsPage> {
           allAchievements[1].add(dashedString);
         }
       });
+      if (allAchievements[1].length == 1) {
+        allAchievements[0].add(allAchievements[1][0]);
+        allAchievements[1] = [];
+        prefs.setBool('Trendmaster', true);
+        createSnackBar('Achievement Unlocked -\nTrendmaster', _scaffoldContext);
+      }
     });
   }
 
@@ -112,7 +107,12 @@ class _AchievementsPageState extends State<AchievementsPage> {
       ),
       body: new Builder(builder: (BuildContext context) {
         _scaffoldContext = context;
-        return new CustomScrollView(slivers: _buildSlivers(context));
+        return new GlowingOverscrollIndicator(
+            axisDirection: AxisDirection.down,
+            color: Colors.green,
+            child: new CustomScrollView(slivers: _buildSlivers(context)
+          )
+        );
       }),
     );
   }
@@ -179,12 +179,12 @@ class _AchievementsPageState extends State<AchievementsPage> {
     ];
     return new Container(
       height: 60.0,
-      color: Colors.lightBlue,
+      color: Colors.green[300],
       padding: EdgeInsets.symmetric(horizontal: 16.0),
       alignment: Alignment.centerLeft,
       child: new Text(
         headings[index] + " " + achievementsFraction[index],
-        style: const TextStyle(color: Colors.white),
+        style: const TextStyle(color: Colors.black, fontSize: 20.0, fontWeight: FontWeight.w400),
       ),
     );
   }

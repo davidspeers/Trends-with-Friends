@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 final whiteText = new TextStyle(
     color: Colors.white,
-    fontSize: 30.0
+    fontSize: 25.0
 ).apply(fontSizeFactor: 2.0);
 
 final whiteTextSmall = new TextStyle(

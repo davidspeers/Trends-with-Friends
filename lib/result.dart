@@ -9,6 +9,7 @@ import 'routes.dart';
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'barChart.dart';
 import 'timeGraph.dart';
@@ -175,7 +176,8 @@ class _ResultsPageState extends State<ResultsPage> {
                   }
                 }
               },
-              child: new Icon(Icons.send),
+              child: new Icon(Icons.send, color: Colors.black87,),
+              backgroundColor: Colors.white70,
             )
         )
     );
@@ -228,7 +230,28 @@ class _ResultsPageState extends State<ResultsPage> {
               }
             }
           } else if (snapshot.hasError) {
-            return new Text("${snapshot.error}");
+            return new Column(
+              children: <Widget>[
+                Text("Thing failed. Check your internet connection and try again"),
+                IconButton(
+                  onPressed: () => Navigator.of(context).push(
+                      new MaterialPageRoute(
+                          builder: (BuildContext context){
+                            return new ResultsPage(
+                              title: widget.title,
+                              queries: widget.queries,
+                              lastQuery: widget.lastQuery,
+                              previousResults: widget.previousResults,
+                              term: widget.term,
+                              mode: widget.mode,
+                              alertChoice: widget.alertChoice
+                            );
+                          }
+                      )
+                  ),
+                )
+              ],
+            );
           }
           // By default, show a loading spinner
           return new Column(
@@ -250,6 +273,7 @@ class _ResultsPageState extends State<ResultsPage> {
   }
 
   Widget _buildScoresTab(Post jsonResponse) {
+    print('-------------------------------------------------');
     switch (widget.mode) {
       case ("Party Mode"): {
         List<int> totals = addLists(widget.previousResults, jsonResponse.weeklyVals.last);

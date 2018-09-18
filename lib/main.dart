@@ -3,9 +3,12 @@ import 'dart:async';
 import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
 
+import 'dart:io';
+
 import 'functions.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import 'fontStyles.dart';
 
@@ -104,8 +107,10 @@ class AnimatedHomeState extends State<AnimatedHome> with TickerProviderStateMixi
 
   getSharedPrefs() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    modeToChoiceIndexMap['Party Mode'] = prefs.getInt('numPlayers') ?? 0;
-    modeToChoiceIndexMap['CPU Mode'] = prefs.getInt('difficulty') ?? 1;
+    setState(() {
+      modeToChoiceIndexMap['Party Mode'] = prefs.getInt('numPlayers') ?? 0;
+      modeToChoiceIndexMap['CPU Mode'] = prefs.getInt('difficulty') ?? 1;
+    });
   }
 
   setSharedPrefs() async {
@@ -168,6 +173,7 @@ class AnimatedHomeState extends State<AnimatedHome> with TickerProviderStateMixi
 
   @override
   void initState() {
+    getSharedPrefs();
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _controller = new AnimationController(
@@ -361,6 +367,7 @@ class AnimatedHomeState extends State<AnimatedHome> with TickerProviderStateMixi
                         setState(() {
                           modeToChoiceIndexMap[mode] = modeToChoiceIndexMap[mode]-1;
                         });
+                        setSharedPrefs();
                       }
                     },
                     mainColor: changeValButtonColor
@@ -378,6 +385,7 @@ class AnimatedHomeState extends State<AnimatedHome> with TickerProviderStateMixi
                         setState(() {
                           modeToChoiceIndexMap[mode] = modeToChoiceIndexMap[mode]+1;
                         });
+                        setSharedPrefs();
                       }
                     },
                     mainColor: changeValButtonColor
@@ -385,9 +393,26 @@ class AnimatedHomeState extends State<AnimatedHome> with TickerProviderStateMixi
                   new Padding(padding: EdgeInsets.only(right: 45.0)),
                 ],
               ),
-              customIconButton(iconImage: Icons.play_circle_filled, size: 60.0, myOnPressed: () {
-                _pushSelected(mode, alertChoice: listChoices[modeToChoiceIndexMap[mode]]);
-              }, mainColor: playButtonColor)
+              customIconButton(
+                iconImage: Icons.play_circle_filled,
+                size: 60.0, myOnPressed: () async {
+                  try {
+                    final result = await InternetAddress.lookup('google.com');
+                    if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+                      //Connected
+                      _pushSelected(mode, alertChoice: listChoices[modeToChoiceIndexMap[mode]]);
+                    }
+                  } on SocketException catch (_) {
+                    Fluttertoast.showToast(
+                        msg: "Internet Connection Required",
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.BOTTOM,
+                        timeInSecForIos: 1,
+                    );
+                  }
+                },
+                mainColor: playButtonColor
+              )
             ],
           ),
         ),

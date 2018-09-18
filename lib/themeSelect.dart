@@ -42,7 +42,7 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     customThemeTitles = prefs.getStringList("CustomThemes") ?? [];
     customThemeTitles.forEach((title) {
-      customThemesMap[title] = prefs.getStringList(title);
+      customThemesMap[title] = prefs.getStringList('Escape $title');
     });
     setState(() {
       customThemesMap;
@@ -74,7 +74,12 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
         backgroundColor: Colors.blue,
       ),
       body: new Builder(builder: (BuildContext context) {
-        return new CustomScrollView(slivers: _buildSlivers(context));
+        return new GlowingOverscrollIndicator(
+            axisDirection: AxisDirection.down,
+            color: Colors.blue,
+            child: new CustomScrollView(slivers: _buildSlivers(context)
+            )
+        );
       }),
     );
   }

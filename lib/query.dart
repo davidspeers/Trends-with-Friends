@@ -28,6 +28,8 @@ class _QueryPageState extends State<QueryPage> {
   final myController = new TextEditingController();
   final List<Color> bgColors = [Colors.blueAccent[200], Colors.redAccent[200], Colors.yellowAccent[200], Colors.greenAccent[200], Colors.purpleAccent[200]];
   var bgColor = Colors.blueAccent[200];
+  var fabIconColor = Colors.black12;
+  var fabBgColor = Colors.white30;
   var teamNum = 1;
   var queries = {}; // This is a Map
   var termIndex = 0;
@@ -50,21 +52,85 @@ class _QueryPageState extends State<QueryPage> {
 
   Widget _queryPageUI() {
 
+
+    void submitWord() async {
+      if (myController.text.isNotEmpty) {
+        switch (widget.mode) {
+          case ("Party Mode"): {
+            queries[teamNum] = myController.text + " " + convertedTerms[termIndex];
+            if (teamNum < widget.alertChoice) {
+              setState(() {
+                bgColor = bgColors[teamNum];
+                teamNum++;
+                myController.text = "";
+                fabIconColor = Colors.black12;
+                fabBgColor = Colors.white30;
+              });
+            } else {
+              // List<int> scores returned from results.dart
+              if (termIndex < convertedTerms.length-1) {
+                List<int> scores = await _pushResults(false);
+                setState(() {
+                  bgColor = bgColors[0];
+                  teamNum = 1;
+                  myController.text = "";
+                  termIndex++;
+                  fabIconColor = Colors.black12;
+                  fabBgColor = Colors.white30;
+                });
+                results = addLists(results, scores);
+              } else {
+                _pushResults(true);
+              }
+            }
+            break;
+          }
+
+          case ("CPU Mode"): {
+            queries["User Answer"] = myController.text + " " + convertedTerms[termIndex];
+            if (termIndex < convertedTerms.length-1) {
+              List<int> scores = await _pushResults(false);
+              myController.text = "";
+              termIndex++;
+              results = addLists(results, scores);
+            } else {
+              _pushResults(true);
+            }
+            break;
+          }
+        }
+      }
+    }
+
     List<Widget> children = [
       new TextField(
-          controller: myController,
-          autofocus: true,
-          decoration: new InputDecoration(
-              fillColor: Colors.yellow,
-              filled: true,
-              contentPadding: new EdgeInsets.fromLTRB(
-                  10.0, 30.0, 10.0, 10.0
-              ),
-              border: new OutlineInputBorder(
-                borderRadius: new BorderRadius.circular(12.0),
-              ),
-              hintText: 'Please Enter Term'
-          )
+        controller: myController,
+        autofocus: true,
+        decoration: new InputDecoration(
+            fillColor: Colors.yellow,
+            filled: true,
+            contentPadding: new EdgeInsets.fromLTRB(
+                10.0, 30.0, 10.0, 10.0
+            ),
+            border: new OutlineInputBorder(
+              borderRadius: new BorderRadius.circular(12.0),
+            ),
+            hintText: 'Enter Term & Hit Enter or > Button'
+        ),
+        onChanged: (text) {
+          if (text.isEmpty) {
+            setState(() {
+              fabIconColor = Colors.black12;
+              fabBgColor = Colors.white30;
+            });
+          } else {
+            setState(() {
+              fabIconColor = Colors.black87;
+              fabBgColor = Colors.white70;
+            });
+          }
+        },
+        onSubmitted: (text) => submitWord(),
       )
     ];
     if (widget.mode == "Party Mode") {
@@ -140,10 +206,13 @@ class _QueryPageState extends State<QueryPage> {
       );
     }
 
+
+
     return Scaffold(
       appBar: new AppBar(
         leading: homeIcon(context),
-        title: new Text('Retrieve Text Input ${widget.title}'),
+        title: new Text(widget.title),
+        backgroundColor: Colors.blue,
       ),
       body: body,
       backgroundColor: bgColor,
@@ -152,52 +221,13 @@ class _QueryPageState extends State<QueryPage> {
         // text the user has typed into our text field.
         // The async and await stuff is there so that the widget doesn't update
         // until the widget is popped back. There may be a better way of doing this.
-        onPressed: () async {
-          switch (widget.mode) {
-            case ("Party Mode"): {
-              queries[teamNum] = myController.text + " " + convertedTerms[termIndex];
-              if (teamNum < widget.alertChoice) {
-                setState(() {
-                  bgColor = bgColors[teamNum];
-                  teamNum++;
-                  myController.text = "";
-                });
-              } else {
-                // List<int> scores returned from results.dart
-                if (termIndex < convertedTerms.length-1) {
-                  List<int> scores = await _pushResults(false);
-                  setState(() {
-                    bgColor = bgColors[0];
-                    teamNum = 1;
-                    myController.text = "";
-                    termIndex++;
-                  });
-                  results = addLists(results, scores);
-                } else {
-                  _pushResults(true);
-                }
-              }
-              break;
-            }
-
-            case ("CPU Mode"): {
-              queries["User Answer"] = myController.text + " " + convertedTerms[termIndex];
-              if (termIndex < convertedTerms.length-1) {
-                List<int> scores = await _pushResults(false);
-                myController.text = "";
-                termIndex++;
-                results = addLists(results, scores);
-              } else {
-                _pushResults(true);
-              }
-              break;
-            }
-          }
-        },
+        onPressed: () => submitWord(),
         tooltip: 'Show me the value!',
-        child: new Icon(Icons.send),
+        child: new Icon(Icons.send, color: fabIconColor,),
+        backgroundColor: fabBgColor,
       ),
     );
+
   }
 
   Future _pushResults(bool lastQuery) {

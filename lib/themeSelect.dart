@@ -34,14 +34,7 @@ SingingCharacter _character = SingingCharacter.lafayette;
 
 class _ThemeSelectPageState extends State<ThemeSelectPage> {
   //List<String> themes = ["TV", "Movies", "Politics", "Harry Potter", "Future", "Muppets", "Animals"];
-  List<String> headings = ["Themed Levels", "Random Levels", "Custom Levels"];
-
-  Map myThemesMap = {
-    'Star Wars': ["Saber"],// "Force", "Blaster", "Jedi", "Speeder", "Space", "Emperor", "Projection"],
-    'Star War': ["Saber"],// "Force", "Blaster", "Jedi", "Speeder", "Space", "Emperor", "Projection"],
-    'Star Was': ["Saber"],// "Force", "Blaster", "Jedi", "Speeder", "Space", "Emperor", "Projection"],
-    'Star Wrs': ["Saber"],// "Force", "Blaster", "Jedi", "Speeder", "Space", "Emperor", "Projection"],
-  };
+  List<String> headings = ["Show Themes", "Random Themes", "Custom Themes"];
 
   //The following code instantiates my customThemesMap & Timer Settings
   Map customThemesMap = {};
@@ -73,7 +66,7 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
 
     //Non-static initialisation
     myLists = [
-    _getKeys(myThemesMap),
+    _getKeys(globals.myThemesMap),
     ["Random Nouns", "Random Show Theme", "Random Words From Show Themes", "Random Custom Theme", "Random Words From Custom Themes"],
     _getKeys(customThemesMap)
     ];
@@ -133,9 +126,8 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
   List<Widget> _buildSlivers(BuildContext context) {
     List<Widget> slivers = new List<Widget>();
 
-    int i = 0;
-    slivers.addAll(_buildLists(context, i, i+=myLists.length, myLists));
-    //slivers.addAll(_buildGrids(context, i, i += 3));
+    slivers.addAll(_buildGrids(context, 0, 1, myLists)); //1 list starting at index 0
+    slivers.addAll(_buildLists(context, 1, 2, myLists)); //2 lists starting at index 1
     return slivers;
   }
 
@@ -159,42 +151,36 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
     });
   }
 
-  /*List<Widget> _buildGrids(BuildContext context, int firstIndex, int count) {
+  List<Widget> _buildGrids(BuildContext context, int firstIndex, int count, List<List<String>> lists) {
     return List.generate(count, (sliverIndex) {
       sliverIndex += firstIndex;
       return new SliverStickyHeader(
-        header: _buildHeader(sliverIndex),
+        header: _buildHeader(sliverIndex, headings),
         sliver: new SliverGrid(
           gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 3, crossAxisSpacing: 4.0, mainAxisSpacing: 4.0),
           delegate: new SliverChildBuilderDelegate(
                 (context, i) => GestureDetector(
-              onTap: () => Scaffold.of(context).showSnackBar(
-                  new SnackBar(content: Text('Grid tile #$i'))),
+              onTap: () => _pushGame(sliverIndex ,i, widget.mode, widget.alertChoice),
               child: new GridTile(
-                child: Card(
-                  child: new Container(
-                    color: Colors.green,
-                  ),
-                ),
-                footer: new Container(
-                  color: Colors.white.withOpacity(0.5),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                child: new Container(
+                  color: Colors.blue[100],
+                  child: Center(
+                    //padding: const EdgeInsets.all(8.0),
                     child: new Text(
-                      'Grid tile #$i',
-                      style: const TextStyle(color: Colors.black),
+                      lists[sliverIndex][i],
+                      style: const TextStyle(color: Colors.black, fontSize: 16.0),
                     ),
                   ),
                 ),
               ),
             ),
-            childCount: 9,
+            childCount: lists[sliverIndex].length,
           ),
         ),
       );
     });
-  }*/
+  }
 
   Widget _buildHeader(int index, List<String> headings) {
     return new Container(
@@ -216,23 +202,35 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
   }
 
   void _pushGame(int headingIndex, int index, String mode, var alertChoice) {
+    //Reset Globals
+    globals.termIndex = 0;
+    if (mode == "Party Mode") {
+      switch (alertChoice) {
+        case 2: globals.totals = [0, 0]; break;
+        case 3: globals.totals = [0, 0, 0]; break;
+        case 4: globals.totals = [0, 0, 0, 0]; break;
+        case 5: globals.totals = [0, 0, 0, 0, 0]; break;
+      }
+    } else {
+      globals.totals = [0, 0];
+    }
     switch (headings[headingIndex]) {
-      case "Themed Levels": {
+      case "Show Themes": {
         globals.isShowTheme = true;
         globals.isRandomTheme = false;
         globals.isCustomTheme = false;
         globals.chosenThemeName = myLists[headingIndex][index];
         Navigator.of(context).push(
-          new QueryPageRoute(
+          new QueryOrTimerPageRoute(
             title: myLists[headingIndex][index],
-            terms: myThemesMap[myLists[headingIndex][index]],
+            terms: globals.myThemesMap[myLists[headingIndex][index]],
             mode: mode,
             alertChoice: alertChoice
           )
         );
         break;
       }
-      case "Random Levels": {
+      case "Random Themes": {
         globals.isShowTheme = false;
         globals.isRandomTheme = true;
         globals.isCustomTheme = false;
@@ -244,7 +242,7 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
           case 'Random Nouns': {
             Future<List<String>> randomWords = getRandomWords();
             Navigator.of(context).push(
-              new QueryPageRoute(
+              new QueryOrTimerPageRoute(
                 title: myLists[headingIndex][index],
                 futureTerms: randomWords,
                 mode: mode, alertChoice:
@@ -254,11 +252,11 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
             break;
           }
           case 'Random Show Theme': {
-            String randomTheme = randomKey(myThemesMap);
+            String randomTheme = randomKey(globals.myThemesMap);
             Navigator.of(context).push(
-              new QueryPageRoute(
+              new QueryOrTimerPageRoute(
                 title: randomTheme,
-                terms: myThemesMap[randomTheme],
+                terms: globals.myThemesMap[randomTheme],
                 mode: mode,
                 alertChoice: alertChoice,
               )
@@ -268,11 +266,11 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
           case 'Random Words From Show Themes': {
             List<String> randomWords = [];
             for (int i=0; i<8; i++) {
-              List<String> randomValues = randomValFromMap(myThemesMap);
+              List<String> randomValues = randomValFromMap(globals.myThemesMap);
               randomWords.add(randomValFromList(randomValues));
             }
             Navigator.of(context).push(
-                new QueryPageRoute(
+                new QueryOrTimerPageRoute(
                     title: 'Random Show Words',
                     terms: randomWords,
                     mode: mode,
@@ -284,7 +282,7 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
           case 'Random Custom Theme': {
             String randomTheme = randomKey(customThemesMap);
             Navigator.of(context).push(
-                new QueryPageRoute(
+                new QueryOrTimerPageRoute(
                     title: randomTheme,
                     terms: customThemesMap[randomTheme],
                     mode: mode,
@@ -300,7 +298,7 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
               randomWords.add(randomValFromList(randomValues));
             }
             Navigator.of(context).push(
-                new QueryPageRoute(
+                new QueryOrTimerPageRoute(
                     title: 'Random Custom Words',
                     terms: randomWords,
                     mode: mode,
@@ -312,13 +310,13 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
         }
         break;
       }
-      case "Custom Levels": {
+      case "Custom Themes": {
         globals.isShowTheme = false;
         globals.isRandomTheme = false;
         globals.isCustomTheme = true;
         globals.chosenThemeName = myLists[headingIndex][index];
         Navigator.of(context).push(
-          new QueryPageRoute(
+          new QueryOrTimerPageRoute(
             title: myLists[headingIndex][index],
             terms: customThemesMap[myLists[headingIndex][index]],
             mode: mode,

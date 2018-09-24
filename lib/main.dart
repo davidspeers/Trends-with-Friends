@@ -77,7 +77,6 @@ class AnimatedHomeState extends State<AnimatedHome> with TickerProviderStateMixi
   //Tests Trendmaster Achievement unlock. Search for floatingactionbar to find function caller
   /*List<String> allAchievements = [
     //All Achievements, except final one
-    "My First Achievement",
     "Trends Newbie",
     "Trends Novice",
     "Trends Pro",

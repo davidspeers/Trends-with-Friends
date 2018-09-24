@@ -90,7 +90,7 @@ class _FinalScorePageState extends State<FinalScorePage> {
           prefs.setStringList('Completed shows', shows);
         }
         //Number needs to be the number of show themes there are
-        if (shows.length >= 4) {
+        if (shows.length >= globals.myThemesMap.length) {
           prefs.setBool('Complete the Show', true);
           createSnackBar('Achievement Unlocked -\nComplete the Show', _scaffoldContext);
         }
@@ -144,7 +144,7 @@ class _FinalScorePageState extends State<FinalScorePage> {
         return new Center(
           child: new Container(
               child: new Text(
-                  getWinners(widget.scores),
+                  getWinners(globals.totals),
                   textAlign: TextAlign.center,
                   style: blackTextBold
               ),
@@ -153,7 +153,7 @@ class _FinalScorePageState extends State<FinalScorePage> {
           ),
         );
       }),
-      backgroundColor: getWinningColor(widget.scores),
+      backgroundColor: getWinningColor(globals.totals),
     );
   }
 

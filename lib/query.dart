@@ -5,6 +5,7 @@ import 'result.dart';
 import 'customWidgets.dart';
 import 'functions.dart';
 import 'fontStyles.dart';
+import 'globals.dart' as globals;
 
 
 import 'dart:async';
@@ -54,10 +55,12 @@ class _QueryPageState extends State<QueryPage> {
 
 
     void submitWord() async {
+      print("INDEX:" + globals.termIndex.toString());
+      print("LENGTH:" + (convertedTerms.length-1).toString());
       if (myController.text.isNotEmpty) {
         switch (widget.mode) {
           case ("Party Mode"): {
-            queries[teamNum] = myController.text + " " + convertedTerms[termIndex];
+            queries[teamNum] = myController.text + " " + convertedTerms[globals.termIndex];
             if (teamNum < widget.alertChoice) {
               setState(() {
                 bgColor = bgColors[teamNum];
@@ -68,13 +71,13 @@ class _QueryPageState extends State<QueryPage> {
               });
             } else {
               // List<int> scores returned from results.dart
-              if (termIndex < convertedTerms.length-1) {
+              if (globals.termIndex < convertedTerms.length-1) {
                 List<int> scores = await _pushResults(false);
                 setState(() {
                   bgColor = bgColors[0];
                   teamNum = 1;
                   myController.text = "";
-                  termIndex++;
+                  //globals.globals.termIndex++;
                   fabIconColor = Colors.black12;
                   fabBgColor = Colors.white30;
                 });
@@ -87,11 +90,11 @@ class _QueryPageState extends State<QueryPage> {
           }
 
           case ("CPU Mode"): {
-            queries["User Answer"] = myController.text + " " + convertedTerms[termIndex];
-            if (termIndex < convertedTerms.length-1) {
+            queries["User Answer"] = myController.text + " " + convertedTerms[globals.termIndex];
+            if (globals.termIndex < convertedTerms.length-1) {
               List<int> scores = await _pushResults(false);
               myController.text = "";
-              termIndex++;
+              //termIndex++;
               results = addLists(results, scores);
             } else {
               _pushResults(true);
@@ -117,6 +120,7 @@ class _QueryPageState extends State<QueryPage> {
             ),
             hintText: 'Enter Term & Hit Enter or > Button'
         ),
+        maxLength: globals.maxTextLength,
         onChanged: (text) {
           if (text.isEmpty) {
             setState(() {
@@ -159,7 +163,7 @@ class _QueryPageState extends State<QueryPage> {
             children.insert(
                 queryInsertIndex,
                 new Text(
-                  "Match 1 word with:\n${convertedTerms[termIndex]}",
+                  "Match 1 word with:\n${convertedTerms[globals.termIndex]}",
                   style: whiteTextSmall,
                 )
             );
@@ -193,7 +197,7 @@ class _QueryPageState extends State<QueryPage> {
       children.insert(
           queryInsertIndex,
           new Text(
-            "Match 1 word with:\n${convertedTerms[termIndex]}",
+            "Match 1 word with:\n${convertedTerms[globals.termIndex]}",
             style: whiteTextSmall,
           )
       );
@@ -233,12 +237,13 @@ class _QueryPageState extends State<QueryPage> {
   Future _pushResults(bool lastQuery) {
     //Converts map to List
     List<String> queriesList = new List<String>.from(queries.values.toList());
+    print("IS LAST QUERY? $lastQuery");
     return Navigator.of(context).push(
       new ResultsPageRoute(
         queriesList,
         lastQuery,
         results,
-        convertedTerms[termIndex],
+        convertedTerms[globals.termIndex],
         widget.mode,
         widget.alertChoice,
       )

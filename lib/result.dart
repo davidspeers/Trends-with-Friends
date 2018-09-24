@@ -6,6 +6,7 @@ import 'customWidgets.dart';
 import 'functions.dart';
 import 'fontStyles.dart';
 import 'routes.dart';
+import 'globals.dart' as globals;
 
 import 'dart:async';
 import 'dart:convert';
@@ -213,8 +214,13 @@ class _ResultsPageState extends State<ResultsPage> {
                 //_pushQueries();
                 //Makes sure user doesn't move to next screen before results displayed (stops bug)
                 if (results!=null) {
+                  globals.termIndex++;
                   if (!widget.lastQuery) {
-                    Navigator.pop(context, results);
+                    if (globals.timerSetting == 0) {
+                      Navigator.pop(context, results);
+                    } else {
+                      Navigator.popUntil(context, ModalRoute.withName('/QueryOrTimer'));
+                    }
                   } else {
                     List<int> finalResults = addLists(results, widget.previousResults);
                     _pushFinalScore(finalResults);
@@ -355,9 +361,9 @@ class _ResultsPageState extends State<ResultsPage> {
   }
 
   Widget _buildScoresTab(Post jsonResponse) {
+    globals.totals = addLists(results, globals.totals);
     switch (widget.mode) {
       case ("Party Mode"): {
-        List<int> totals = addLists(widget.previousResults, jsonResponse.weeklyVals.last);
         return new ListView.builder(
           itemBuilder: (context, index) {
             return new Container(
@@ -366,18 +372,17 @@ class _ResultsPageState extends State<ResultsPage> {
                   title: new Text("Team ${index+1}:", style: whiteText,),
                   subtitle: new Text(
                       "${widget.queries[index]}: ${jsonResponse.weeklyVals.last[index].toString()}"
-                          "\nTotal: ${totals[index]}",
+                          "\nTotal: ${globals.totals[index]}",
                       style: whiteTextSmall
                   ),
                 )
             );
           },
-          itemCount: totals.length,
+          itemCount: globals.totals.length,
         );
       }
 
       case ("CPU Mode"): {
-        List<int> totals = addLists(widget.previousResults, jsonResponse.weeklyVals.last);
         List<String> messages = ["Your Answer:", "CPU Answer:"];
         List<String> allQueries = [widget.queries[0], toTitleCase(jsonResponse.cpuAnswer)];
         return new ListView.builder(
@@ -388,13 +393,13 @@ class _ResultsPageState extends State<ResultsPage> {
                   title: new Text(messages[index], style: whiteText),
                   subtitle: new Text(
                       "${allQueries[index]}: ${jsonResponse.weeklyVals.last[index].toString()}"
-                          "\nTotal: ${totals[index]}",
+                          "\nTotal: ${globals.totals[index]}",
                       style: whiteTextSmall
                   ),
                 )
             );
           },
-          itemCount: totals.length,
+          itemCount: globals.totals.length,
         );
       }
 

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:async';
+import 'globals.dart' as globals;
 
 import 'themeSelect.dart';
 import 'query.dart';
+import 'timer.dart';
 import 'result.dart';
 import 'finalScore.dart';
 import 'about.dart';
@@ -21,6 +23,44 @@ class ThemeSelectRoute extends CupertinoPageRoute {
   );
 }
 
+class QueryOrTimerPageRoute extends CupertinoPageRoute {
+  final String title;
+  final List<String> terms;
+  final Future<List<String>> futureTerms;
+  final String mode;
+  final dynamic alertChoice;
+
+  QueryOrTimerPageRoute({@required this.title, this.terms, this.futureTerms, @required this.mode, @required this.alertChoice})
+      : super(
+    //WillPopScope stops the swipe left to go back feature
+    builder: (BuildContext context) {
+      if (globals.timerSetting == 0) {
+        return new WillPopScope(
+          onWillPop: () async {
+            return false;
+          },
+          child: new QueryPage(
+            title: title,
+            terms: terms,
+            futureTerms: futureTerms,
+            mode: mode,
+            alertChoice: alertChoice,
+          ),
+        );
+      } else {
+        return new TimerPage(
+          title: title,
+          terms: terms,
+          futureTerms: futureTerms,
+          mode: mode,
+          alertChoice: alertChoice
+        );
+      }
+    },
+    settings: RouteSettings(name: "/QueryOrTimer")
+  );
+}
+
 class QueryPageRoute extends CupertinoPageRoute {
   final String title;
   final List<String> terms;
@@ -31,19 +71,21 @@ class QueryPageRoute extends CupertinoPageRoute {
   QueryPageRoute({@required this.title, this.terms, this.futureTerms, @required this.mode, @required this.alertChoice})
       : super(
     //WillPopScope stops the swipe left to go back feature
-    builder: (BuildContext context) => new WillPopScope(
-        onWillPop: () async {
-          return false;
-        },
-        child: new QueryPage(
-          title: title,
-          terms: terms,
-          futureTerms: futureTerms,
-          mode: mode,
-          alertChoice: alertChoice,
-        ),
-      )
-    );
+      builder: (BuildContext context) {
+        return new WillPopScope(
+          onWillPop: () async {
+            return false;
+          },
+          child: new QueryPage(
+            title: title,
+            terms: terms,
+            futureTerms: futureTerms,
+            mode: mode,
+            alertChoice: alertChoice,
+          ),
+        );
+      }
+  );
 }
 
 class ResultsPageRoute extends CupertinoPageRoute {
@@ -71,7 +113,7 @@ class ResultsPageRoute extends CupertinoPageRoute {
         mode: mode,
         alertChoice: alertChoice,
     ),
-    fullscreenDialog: true
+    //fullscreenDialog: true
   );
 }
 

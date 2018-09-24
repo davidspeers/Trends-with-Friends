@@ -30,7 +30,6 @@ class _AchievementsPageState extends State<AchievementsPage> {
     ],
     [
       //All Achievements
-      "My First Achievement - Look at your achievements",
       "Trends Newbie - Play 1 Game",
       "Trends Novice - Play 10 Games",
       "Trends Pro - Play 100 Games",
@@ -59,15 +58,7 @@ class _AchievementsPageState extends State<AchievementsPage> {
   BuildContext _scaffoldContext;
 
   getSharedPrefs() async {
-
-    //If first time on AchievementsPage unlock First Achievement
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String initialAchievement = "My First Achievement";
-    bool isInitialised = prefs.getBool(initialAchievement) ?? false;
-    if (!isInitialised) {
-      prefs.setBool(initialAchievement, true);
-      createSnackBar('Achievement Unlocked -\nMy First Achievement', _scaffoldContext);
-    }
 
     //Check which achievements have already been unlocked and add them to the correct list
     String achievementName;

@@ -6,8 +6,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 
 import 'query.dart';
+import 'fontStyles.dart';
 import 'routes.dart';
 import 'customWidgets.dart';
+import 'package:flutter/cupertino.dart';
 import 'functions.dart';
 import 'globals.dart' as globals;
 
@@ -24,22 +26,30 @@ class ThemeSelectPage extends StatefulWidget {
   _ThemeSelectPageState createState() => new _ThemeSelectPageState();
 }
 
+// At the top level:
+enum SingingCharacter { lafayette, jefferson }
+
+// In the State of a stateful widget:
+SingingCharacter _character = SingingCharacter.lafayette;
+
 class _ThemeSelectPageState extends State<ThemeSelectPage> {
   //List<String> themes = ["TV", "Movies", "Politics", "Harry Potter", "Future", "Muppets", "Animals"];
   List<String> headings = ["Themed Levels", "Random Levels", "Custom Levels"];
 
   Map myThemesMap = {
-    'Star Wars': ["Saber", "Force", "Blaster", "Jedi", "Speeder"],//, "Space", "Emperor", "Projection"]
-    'Star War': ["Saber", "Force", "Blaster", "Jedi", "Speeder"],//, "Space", "Emperor", "Projection"]
-    'Star Was': ["Saber", "Force", "Blaster", "Jedi", "Speeder"],//, "Space", "Emperor", "Projection"]
-    'Star Wrs': ["Saber", "Force", "Blaster", "Jedi", "Speeder"],//, "Space", "Emperor", "Projection"]
+    'Star Wars': ["Saber"],// "Force", "Blaster", "Jedi", "Speeder", "Space", "Emperor", "Projection"],
+    'Star War': ["Saber"],// "Force", "Blaster", "Jedi", "Speeder", "Space", "Emperor", "Projection"],
+    'Star Was': ["Saber"],// "Force", "Blaster", "Jedi", "Speeder", "Space", "Emperor", "Projection"],
+    'Star Wrs': ["Saber"],// "Force", "Blaster", "Jedi", "Speeder", "Space", "Emperor", "Projection"],
   };
 
-  //The following code instantiates my customThemesMap
+  //The following code instantiates my customThemesMap & Timer Settings
   Map customThemesMap = {};
   List<String> customThemeTitles;
+
   getSharedPrefs() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    globals.timerSetting = prefs.getInt('timerChoice') ?? 0;
     customThemeTitles = prefs.getStringList("CustomThemes") ?? [];
     customThemeTitles.forEach((title) {
       customThemesMap[title] = prefs.getStringList('Escape $title');
@@ -72,6 +82,42 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
       appBar: new AppBar(
         title: Text(widget.title),
         backgroundColor: Colors.blue,
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.timer),
+            onPressed: () {
+              List<String> timerChoices = [
+                'No Timer',
+                '15 Seconds',
+                '30 Seconds',
+                '45 Seconds',
+                '60 Seconds'
+              ];
+              showDialog<Null>(
+                context: context,
+                //barrierDismissible: true, // outside click dismisses alert
+                builder: (BuildContext context) {
+                  getSharedPrefs();
+                  return SimpleDialog(
+                    title: Container(
+                      color: Colors.grey[50],
+                      padding: EdgeInsets.all(5.0),
+                      child: Text(
+                        'Timer Settings',
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    titlePadding: EdgeInsets.all(0.0),
+                    contentPadding: EdgeInsets.all(0.0),
+                    children: <Widget>[
+                      RadioAlertDialog(buttonNames: timerChoices)
+                    ],
+                  );
+                }
+              );
+            },
+          )
+        ],
       ),
       body: new Builder(builder: (BuildContext context) {
         return new GlowingOverscrollIndicator(

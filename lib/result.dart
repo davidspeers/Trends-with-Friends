@@ -36,11 +36,17 @@ class Post {
     //Here is the better version:
     List<int> returnedAvgs = json["averages"].cast<int>();
     List<List<int>> weeklyVals = [];
-    json["values"].forEach((val) => weeklyVals.add(val["value"].cast<int>()));
-    print(weeklyVals);
     List<String> allDates = [];
-    json["values"].forEach((val) => allDates.add(val["formattedAxisTime"]));
-    print(allDates);
+    //Because returnedAvgs isEmpty when gibberish was the input/
+    //This stops an error occuring and lets me put the contingency in snapshot.hasdata
+    if (returnedAvgs.isNotEmpty) {
+      json["values"].forEach((val) => weeklyVals.add(val["value"].cast<int>()));
+      print(weeklyVals);
+      json["values"].forEach((val) => allDates.add(val["formattedAxisTime"]));
+      print(allDates);
+    } else {
+      weeklyVals = [json["values"].cast<int>()];
+    }
     return new Post(
       avgs: returnedAvgs,
       weeklyVals: weeklyVals,
@@ -50,7 +56,9 @@ class Post {
   }
 }
 
+bool isFetchingPost = false;
 Future<Post> fetchPost(String mode, var alertChoice, String term, List<String> queries) async {
+  isFetchingPost = true;
   final url = "https://trends-app-server.herokuapp.com/";
   final response =
   await http.post(url, body: json.encode({'secret_val': 'potato', 'mode': mode, 'difficulty': alertChoice, 'query': term, 'values': queries}));
@@ -59,8 +67,40 @@ Future<Post> fetchPost(String mode, var alertChoice, String term, List<String> q
   print("Averages: ${responseJson["averages"]}");
   print("Weekly Values: ${responseJson["values"]}");
   print("CPU Answer: ${responseJson["cpuAnswer"] ?? "No CPU Answer"}");
+  isFetchingPost = false;
   return new Post.fromJson(responseJson);
 }
+
+/*Future<Post> fetchPost() async {
+  final response =
+  await http.get('https://jsonplaceholder.typicode.com/posts/1');
+
+  if (response.statusCode == 200) {
+    // If the call to the server was successful, parse the JSON
+    return Post.fromJson(json.decode(response.body));
+  } else {
+    // If that call was not successful, throw an error.
+    throw Exception('Failed to load post');
+  }
+}
+
+class Post {
+  final int userId;
+  final int id;
+  final String title;
+  final String body;
+
+  Post({this.userId, this.id, this.title, this.body});
+
+  factory Post.fromJson(Map<String, dynamic> json) {
+    return Post(
+      userId: json['userId'],
+      id: json['id'],
+      title: json['title'],
+      body: json['body'],
+    );
+  }
+}*/
 
 class ResultsPage extends StatefulWidget {
   //Note: the curly braces means the values are optional and that you have to do key:value when specifying
@@ -79,6 +119,7 @@ class ResultsPage extends StatefulWidget {
 }
 
 class _ResultsPageState extends State<ResultsPage> {
+
   final List<dynamic> colors = [Colors.blue, Colors.red, Colors.yellow, Colors.green, Colors.purple];
 
   List<int> results;
@@ -129,29 +170,33 @@ class _ResultsPageState extends State<ResultsPage> {
     }
   }
 
+  Future<Post> fetchedPost;
+
   @override
-  Widget build(BuildContext context) {
-    return _resultsPageUI();
+  void initState() {
+    fetchedPost = fetchPost(widget.mode, widget.alertChoice, widget.term, widget.queries); // only create the future once.
+    super.initState();
   }
 
-  Widget _resultsPageUI() {
-    
+  @override
+  Widget build(BuildContext context) {
+
     List<String> tabs = ["Scores", "Past Scores", "Average"];
+    List<Widget> myTabContents = [];
 
     List<Widget> myTabs = [];
     tabs.forEach((tabName) => myTabs.add(Tab(text: tabName))); //Tab widget can contain an Icon or a child not just text
 
-    List<Widget> myTabContents = [];
     //Need to get the future here because or else you'll call 3 post requests
-    Future fetchedPost = fetchPost(widget.mode, widget.alertChoice, widget.term, widget.queries);
-    tabs.forEach((tabName) => myTabContents.add(_buildFuturePostWidget(tabName, fetchedPost))); //Tab widget can contain an Icon or a child not just text
+    //this.fetchedPost = fetchPost(widget.mode, widget.alertChoice, widget.term, widget.queries);
+    tabs.forEach((tabName) => myTabContents.add(_buildFuturePostWidget(tabName))); //Tab widget can contain an Icon or a child not just text
 
     return new DefaultTabController(
         length: tabs.length,
         child: new Scaffold(
             appBar: new AppBar(
               bottom: TabBar(
-                tabs: myTabs
+                  tabs: myTabs
               ),
               title: Text('Fetch Data Example'),
             ),
@@ -185,20 +230,57 @@ class _ResultsPageState extends State<ResultsPage> {
 
   void _pushFinalScore(List<int> results) {
     Navigator.of(context).push(
-      new FinalScorePageRoute(
-        title: "Hello",
-        scores: results,
-        mode: widget.mode,
-      )
+        new FinalScorePageRoute(
+          title: "Hello",
+          scores: results,
+          mode: widget.mode,
+        )
     );
   }
 
-  Widget _buildFuturePostWidget(String tabName, Future fetchedPost) {
+  Widget _buildFuturePostWidget(String tabName) {
     return new Center(
       child: new FutureBuilder<Post>(
         future: fetchedPost,
         builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return CircularProgressIndicator();
+          }
           if (snapshot.hasData) {
+            if (snapshot.data.avgs.isEmpty) {
+              results = snapshot.data.weeklyVals.last;
+              switch (tabName) {
+                case ("Scores"): {
+                  return _buildScoresTab(snapshot.data);
+                }
+                case ("Past Scores"): {
+                  //return Text('No data available for either term.');
+                  if (widget.mode == "Party Mode") {
+                    return TimeSeriesCallbackChart.empty(
+                      widget.queries
+                    );
+                  } else if (widget.mode == "CPU Mode") {
+                    return TimeSeriesCallbackChart.empty(
+                      widget.queries + [(toTitleCase(snapshot.data.cpuAnswer))]
+                    );
+                  }
+                  break;
+                }
+                case ("Average"): {
+                  //return Text('No data available for either term.');
+                  List<int> averages = [];
+                  widget.queries.forEach((string) => averages.add(0));
+                  if (widget.mode == "CPU Mode") {
+                    averages.add(0);
+                  }
+                  return new SimpleBarChart.withGivenData(averages);
+                }
+                default: {
+                  print("Error - 'tabName' doesn't match with any of the 'tabs' items");
+                  return Text("Check Error Logs");
+                }
+              }
+            }
             updateAchievements(snapshot.data);
             results = snapshot.data.weeklyVals.last; //DO NOT REMOVE - This variable is used elsewhere
             switch (tabName) {
@@ -214,9 +296,9 @@ class _ResultsPageState extends State<ResultsPage> {
                   );
                 } else if (widget.mode == "CPU Mode") {
                   return new TimeSeriesCallbackChart.withTrendsValues(
-                    snapshot.data.weeklyVals,
-                    snapshot.data.allDates,
-                    widget.queries + [(toTitleCase(snapshot.data.cpuAnswer))]
+                      snapshot.data.weeklyVals,
+                      snapshot.data.allDates,
+                      widget.queries + [(toTitleCase(snapshot.data.cpuAnswer))]
                   );
                 }
                 break;
@@ -230,65 +312,64 @@ class _ResultsPageState extends State<ResultsPage> {
               }
             }
           } else if (snapshot.hasError) {
+            print(snapshot.error);
             return new Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                Text("Thing failed. Check your internet connection and try again"),
-                IconButton(
-                  onPressed: () => Navigator.of(context).push(
-                      new MaterialPageRoute(
-                          builder: (BuildContext context){
-                            return new ResultsPage(
-                              title: widget.title,
-                              queries: widget.queries,
-                              lastQuery: widget.lastQuery,
-                              previousResults: widget.previousResults,
-                              term: widget.term,
-                              mode: widget.mode,
-                              alertChoice: widget.alertChoice
-                            );
-                          }
-                      )
+                Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: Text(
+                    "Connection failed.\nCheck your internet connection and try again.",
+                    style: blackTextSmaller,
+                    textAlign: TextAlign.center,
                   ),
+                ),
+                RaisedButton(
+                  child: Text('Try Again'),
+                  onPressed: () {
+                    if (isFetchingPost) {
+                      setState(() {
+                        fetchedPost = fetchPost(widget.mode, widget.alertChoice, widget.term, widget.queries);
+                      });
+                    }
+                  }
+                  //tabs[0] = 'hello';
+                  //myTabContents[0] = Text('hello');
+                  //build(_scaffoldContext);
+
+                  //fetchedPost = fetchPost(widget.mode, widget.alertChoice, widget.term, widget.queries);
+                  //print(fetchedPost.toString());
+                  //tabs.forEach((tabName) => myTabContents.add(_buildFuturePostWidget(tabName, fetchedPost)));
+                  ,
                 )
               ],
             );
           }
           // By default, show a loading spinner
-          return new Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                new Padding(
-                  padding: const EdgeInsets.all(15.0),
-                  child: new Text(
-                    "Calculating Trendiest Term",
-                    style: blackTextSmall,
-                  ),
-                ),
-                CircularProgressIndicator(),
-              ]
-          );
+          // (although I think if connectionstate covers this already)
+          return CircularProgressIndicator();
         },
       ),
     );
   }
 
   Widget _buildScoresTab(Post jsonResponse) {
-    print('-------------------------------------------------');
     switch (widget.mode) {
       case ("Party Mode"): {
         List<int> totals = addLists(widget.previousResults, jsonResponse.weeklyVals.last);
         return new ListView.builder(
           itemBuilder: (context, index) {
             return new Container(
-              color: colors[index],
-              child: ListTile(
-                title: new Text("Team ${index+1}:", style: whiteText,),
-                subtitle: new Text(
-                  "${widget.queries[index]}: ${jsonResponse.weeklyVals.last[index].toString()}"
-                    "\nTotal: ${totals[index]}",
-                  style: whiteTextSmall
-                ),
-              )
+                color: colors[index],
+                child: ListTile(
+                  title: new Text("Team ${index+1}:", style: whiteText,),
+                  subtitle: new Text(
+                      "${widget.queries[index]}: ${jsonResponse.weeklyVals.last[index].toString()}"
+                          "\nTotal: ${totals[index]}",
+                      style: whiteTextSmall
+                  ),
+                )
             );
           },
           itemCount: totals.length,
@@ -302,15 +383,15 @@ class _ResultsPageState extends State<ResultsPage> {
         return new ListView.builder(
           itemBuilder: (context, index) {
             return new Container(
-              color: colors[index],
-              child: ListTile(
-                title: new Text(messages[index], style: whiteText),
-                subtitle: new Text(
-                  "${allQueries[index]}: ${jsonResponse.weeklyVals.last[index].toString()}"
-                      "\nTotal: ${totals[index]}",
-                  style: whiteTextSmall
-                ),
-              )
+                color: colors[index],
+                child: ListTile(
+                  title: new Text(messages[index], style: whiteText),
+                  subtitle: new Text(
+                      "${allQueries[index]}: ${jsonResponse.weeklyVals.last[index].toString()}"
+                          "\nTotal: ${totals[index]}",
+                      style: whiteTextSmall
+                  ),
+                )
             );
           },
           itemCount: totals.length,
@@ -323,6 +404,4 @@ class _ResultsPageState extends State<ResultsPage> {
     }
 
   }
-
 }
-

@@ -31,3 +31,6 @@ bool isRandomTheme = false;
 bool isCustomTheme = false;
 String chosenThemeName = '';
 int cpuDifficulty = 0; // 0 => Party Mode (NA), 4 => Impossible
+
+//
+int timerSetting = 0;

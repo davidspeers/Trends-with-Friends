@@ -13,16 +13,40 @@ class TimeSeriesCallbackChart extends StatefulWidget {
 
   TimeSeriesCallbackChart(this.seriesList, {this.animate});
 
+  factory TimeSeriesCallbackChart.empty(List<String> usersAnswers) {
+    userAnswers = usersAnswers;
+    List<List<int>> weeklyVals = [[], []];
+    for (int i=0; i<2; i++) {
+      usersAnswers.forEach((string) => weeklyVals[i].add(0));
+    }
+    DateTime today = DateTime.now();
+    return new TimeSeriesCallbackChart(_createWithData(
+      weeklyVals: weeklyVals,
+      allDateTimeDates: [DateTime.utc(today.year-1, today.month, today.day), today]
+    ));
+  }
+
   factory TimeSeriesCallbackChart.withTrendsValues(List<List<int>> weeklyVals, List<String> allDates, List<String> usersAnswers) {
     userAnswers = usersAnswers;
-    return new TimeSeriesCallbackChart(_createWithData(weeklyVals, allDates));
+    return new TimeSeriesCallbackChart(_createWithData(
+      weeklyVals: weeklyVals, allDates: allDates
+    ));
   }
 
   //All functions need to be static because factorys are static.
-  static List<charts.Series<TimeSeriesScore, DateTime>> _createWithData(List<List<int>> weeklyVals, List<String> allDates) {
+  static List<charts.Series<TimeSeriesScore, DateTime>> _createWithData({
+    List<List<int>> weeklyVals,
+    List<String> allDates, //Use this one for withTrendsValues
+    List<DateTime> allDateTimeDates //Use this one for empty
+  }) {
     List<charts.Series<TimeSeriesScore, DateTime>> graphLinesList = [];
     List<TimeSeriesScore> data;
-    List<DateTime> dateTimes = convertStringsToDateTimes(allDates);
+    List<DateTime> dateTimes;
+    if (allDateTimeDates == null) {
+      dateTimes = convertStringsToDateTimes(allDates);
+    } else {
+      dateTimes = allDateTimeDates;
+    }
 
     //Instatiate data in the form [List<TimeSeriesScore> * number of teams]
     //For each team
@@ -96,16 +120,17 @@ class TimeSeriesCallbackChart extends StatefulWidget {
 
 class _SelectionCallbackState extends State<TimeSeriesCallbackChart> {
   DateTime _time;
-  LinkedHashMap<String, num> _measures;
+  LinkedHashMap<String, num> _measures = new LinkedHashMap();
 
   // Listens to the underlying selection changes, and updates the information
   // relevant to building the primitive legend like information under the
   // chart.
   _onSelectionChanged(charts.SelectionModel model) {
     final selectedDatum = model.selectedDatum;
+    print('[[[[[[' + model.selectedSeries[0].id);
 
     DateTime time;
-    final measures = <String, num>{};
+    final LinkedHashMap<String, num> measures = new LinkedHashMap();
 
     // We get the model that updated with a list of [SeriesDatum] which is
     // simply a pair of series & datum.
@@ -114,6 +139,11 @@ class _SelectionCallbackState extends State<TimeSeriesCallbackChart> {
     // series name for each selection point.
     if (selectedDatum.isNotEmpty) {
       time = selectedDatum.first.datum.time;
+      print('------------' + selectedDatum.toString());
+      print(';;;;;;;' + selectedDatum[0].datum.score.toString());
+      print(';;;;;;;' + selectedDatum[0].series.toString());
+      print(';;;;;;;' + selectedDatum[0].hashCode.toString());
+      print(';;;;;;;' + selectedDatum[0].datum.toString());
       selectedDatum.forEach((charts.SeriesDatum datumPair) {
         measures[datumPair.series.displayName] = datumPair.datum.score;
       });
@@ -181,7 +211,7 @@ class _SelectionCallbackState extends State<TimeSeriesCallbackChart> {
           child: new Text("Week Beginning: $month $day, $year", style: blackTextSmall)));
     }
     children.add(new Padding(padding: new EdgeInsets.all(5.0)));
-    int i = 0;
+    /*int i = 0;
     _measures?.forEach((String series, num value) {
       children.add(
         new Container(
@@ -189,13 +219,30 @@ class _SelectionCallbackState extends State<TimeSeriesCallbackChart> {
           width: double.infinity,
           alignment: Alignment.center,
           child: new Text(
-            '${userAnswers[i]}: ${value}',
+            '$series: $value',
             style: whiteTextSmall,
           ),
         )
       );
       i++;
-    });
+    });*/
+    int i = 0;
+    while (i < _measures.length) {
+      String teamName = 'Team ${i+1}';
+      num value = _measures[teamName];
+      children.add(
+        new Container(
+          color: globalColors[i],
+          width: double.infinity,
+          alignment: Alignment.center,
+          child: new Text(
+            '${userAnswers[i]}: $value',
+            style: whiteTextSmall,
+          ),
+        )
+      );
+      i++;
+    }
 
     return new Column(children: children);
   }

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'fontStyles.dart';
+import 'globals.dart' as globals;
 
 Widget homeIcon(BuildContext context) {
   var backIcon;
@@ -164,6 +167,93 @@ class SimpleScaffold extends StatelessWidget {
       ),
       body: child,
     );
+  }
+}
+
+///Normal AlertDialogs can't change once displayed.
+///Therefore this custom alert content one is needed so the radio tiles change
+class RadioAlertDialog extends StatefulWidget {
+  RadioAlertDialog({
+    Key key,
+    this.buttonNames,
+  }): super(key: key);
+
+  final List<String> buttonNames;
+
+  @override
+  _RadioAlertDialogState createState() => new _RadioAlertDialogState();
+}
+
+class _RadioAlertDialogState extends State<RadioAlertDialog> {
+
+  int _selectedIndex;
+
+  @override
+  void initState() {
+    _selectedIndex = globals.timerSetting;
+    super.initState();
+  }
+
+  setSharedPrefs() async {
+    globals.timerSetting = _selectedIndex;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setInt('timerChoice', _selectedIndex);
+  }
+
+  _getContent(){
+    if (widget.buttonNames.length == 0){
+      return new Container();
+    }
+
+    return new Column (
+        children: <Widget>[
+          Material(
+            child: new Column(
+                children: new List<RadioListTile<int>>.generate(
+                    widget.buttonNames.length,
+                        (int index){
+                      return new RadioListTile<int>(
+                        value: index,
+                        groupValue: _selectedIndex,
+                        title: new Text(widget.buttonNames[index]),
+                        onChanged: (int value) {
+                          setState((){
+                            _selectedIndex = value;
+                          });
+                        },
+                      );
+                    }
+                )
+            )
+          ),
+          SizedBox(
+            height: 5.0,
+            child: Container(
+              color: Colors.grey[50],
+            ),
+          ),
+          ButtonTheme(
+            minWidth: double.infinity,
+            height: 50.0,
+            padding: EdgeInsets.all(0.0),
+            child: RaisedButton(
+              child: Text('Confirm', style: blackTextSmaller,),
+              color: Colors.blue[400],
+              onPressed: () async {
+                setSharedPrefs();
+                Navigator.of(context).pop();
+              },
+              //elevation: 0.0,
+              //highlightElevation: 0.0,
+            ),
+          ),
+        ]
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _getContent();
   }
 }
 

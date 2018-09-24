@@ -79,6 +79,24 @@ class _FinalScorePageState extends State<FinalScorePage> {
       }
     }
 
+    //If Show Theme Achievements
+    bool hasCompleteShow = prefs.getBool('Complete the Show') ?? false;
+    if (!hasCompleteShow) {
+      if (globals.isShowTheme) {
+        List<String> shows = prefs.getStringList('Completed shows') ?? [];
+        //print('---------Played Shows: $shows');
+        if (!shows.contains(globals.chosenThemeName)) {
+          shows.add(globals.chosenThemeName);
+          prefs.setStringList('Completed shows', shows);
+        }
+        //Number needs to be the number of show themes there are
+        if (shows.length >= 4) {
+          prefs.setBool('Complete the Show', true);
+          createSnackBar('Achievement Unlocked -\nComplete the Show', _scaffoldContext);
+        }
+      }
+    }
+
     //If Custom Theme Achievements
     bool isTrendsGetter = prefs.getBool('Trends Getter') ?? false;
     if (!isTrendsGetter) {

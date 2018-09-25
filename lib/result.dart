@@ -179,6 +179,8 @@ class _ResultsPageState extends State<ResultsPage> {
     super.initState();
   }
 
+  AppBar myAppBar;
+
   @override
   Widget build(BuildContext context) {
 
@@ -192,15 +194,19 @@ class _ResultsPageState extends State<ResultsPage> {
     //this.fetchedPost = fetchPost(widget.mode, widget.alertChoice, widget.term, widget.queries);
     tabs.forEach((tabName) => myTabContents.add(_buildFuturePostWidget(tabName))); //Tab widget can contain an Icon or a child not just text
 
+    //doing it like this so I can obtain the height
+    myAppBar = new AppBar(
+      backgroundColor: Colors.blue,
+      bottom: TabBar(
+          tabs: myTabs
+      ),
+      title: Text('Fetch Data Example'),
+    );
+
     return new DefaultTabController(
         length: tabs.length,
         child: new Scaffold(
-            appBar: new AppBar(
-              bottom: TabBar(
-                  tabs: myTabs
-              ),
-              title: Text('Fetch Data Example'),
-            ),
+            appBar: myAppBar,
             body: new Builder(builder: (BuildContext context) {
               _scaffoldContext = context;
               return new TabBarView(
@@ -215,6 +221,7 @@ class _ResultsPageState extends State<ResultsPage> {
                 //Makes sure user doesn't move to next screen before results displayed (stops bug)
                 if (results!=null) {
                   globals.termIndex++;
+                  globals.totals = addLists(results, globals.totals); //Make sure it's only called once
                   if (!widget.lastQuery) {
                     if (globals.timerSetting == 0) {
                       Navigator.pop(context, results);
@@ -227,7 +234,7 @@ class _ResultsPageState extends State<ResultsPage> {
                   }
                 }
               },
-              child: new Icon(Icons.send, color: Colors.black87,),
+              child: new Icon(Icons.send, color: Colors.black87),
               backgroundColor: Colors.white70,
             )
         )
@@ -361,52 +368,57 @@ class _ResultsPageState extends State<ResultsPage> {
   }
 
   Widget _buildScoresTab(Post jsonResponse) {
-    globals.totals = addLists(results, globals.totals);
+    List<String> allQueries;
+    List<String> messages;
     switch (widget.mode) {
       case ("Party Mode"): {
-        return new ListView.builder(
-          itemBuilder: (context, index) {
-            return new Container(
-                color: colors[index],
-                child: ListTile(
-                  title: new Text("Team ${index+1}:", style: whiteText,),
-                  subtitle: new Text(
-                      "${widget.queries[index]}: ${jsonResponse.weeklyVals.last[index].toString()}"
-                          "\nTotal: ${globals.totals[index]}",
-                      style: whiteTextSmall
-                  ),
-                )
-            );
-          },
-          itemCount: globals.totals.length,
-        );
+        allQueries = widget.queries;
+        messages = [];
+        for (int i=0; i<allQueries.length; i++) {
+          messages.add('Team ${i+1}:');
+        }
+        break;
       }
 
       case ("CPU Mode"): {
-        List<String> messages = ["Your Answer:", "CPU Answer:"];
-        List<String> allQueries = [widget.queries[0], toTitleCase(jsonResponse.cpuAnswer)];
-        return new ListView.builder(
-          itemBuilder: (context, index) {
-            return new Container(
-                color: colors[index],
-                child: ListTile(
-                  title: new Text(messages[index], style: whiteText),
-                  subtitle: new Text(
-                      "${allQueries[index]}: ${jsonResponse.weeklyVals.last[index].toString()}"
-                          "\nTotal: ${globals.totals[index]}",
-                      style: whiteTextSmall
-                  ),
-                )
-            );
-          },
-          itemCount: globals.totals.length,
-        );
+        messages = ["Your Answer:", "CPU Answer:"];
+        allQueries = [widget.queries[0], toTitleCase(jsonResponse.cpuAnswer)];
+        break;
       }
 
       default: {
         return new Text("Error - mode not of expected type");
       }
     }
+
+    List<Widget> myChildren = [];
+
+    for (int i=0; i<messages.length; i++) {
+      myChildren.add(
+          new Expanded(
+              child: Container(
+                color: globals.globalColors[i],
+                width: double.infinity,
+                alignment: Alignment.center,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    new Flexible(child: Text(messages[i], style: whiteText)),
+                    new Flexible(child: Text(
+                        "${allQueries[i]}: ${jsonResponse.weeklyVals.last[i].toString()}"
+                            "\nTotal: ${addLists(results, globals.totals)[i]}",
+                        style: whiteTextSmall
+                    )),
+                  ],
+                ),
+              )
+          )
+      );
+    }
+
+    return Column(
+        children: myChildren
+    );
 
   }
 }

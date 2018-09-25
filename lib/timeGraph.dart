@@ -231,13 +231,15 @@ class _SelectionCallbackState extends State<TimeSeriesCallbackChart> {
       String teamName = 'Team ${i+1}';
       num value = _measures[teamName];
       children.add(
-        new Container(
-          color: globalColors[i],
-          width: double.infinity,
-          alignment: Alignment.center,
-          child: new Text(
-            '${userAnswers[i]}: $value',
-            style: whiteTextSmall,
+        new Expanded(
+          child: Container(
+            color: globalColors[i],
+            width: double.infinity,
+            alignment: Alignment.center,
+            child: new Text(
+                '${userAnswers[i]}: $value',
+                style: whiteTextSmall,
+            ),
           ),
         )
       );

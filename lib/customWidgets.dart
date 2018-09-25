@@ -60,19 +60,33 @@ Widget alertBackIcon(BuildContext context, String message, String modalRouteName
     onPressed: () {
       showDialog<Null>(
         context: context,
-        barrierDismissible: false, // outside click dismisses alert
+        //barrierDismissible: false, // outside click dismisses alert
         builder: (BuildContext context) {
           return new AlertDialog(
             title: new Text(message),
             actions: <Widget>[
               new FlatButton(
-                child: new Text('Cancel'),
+                child: new Text(
+                  'Cancel',
+                  style: TextStyle(
+                      color: Colors.blue,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16.0
+                  ),
+                ),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
               ),
               new FlatButton(
-                child: new Text('Confirm'),
+                child: new Text(
+                  'Confirm',
+                  style: TextStyle(
+                      color: Colors.blue,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16.0
+                  ),
+                ),
                 onPressed: () {
                   //Look at main.dart to see how I routes to name the desired ModalRoute
                   Navigator.popUntil(context, ModalRoute.withName(modalRouteName));
@@ -226,7 +240,44 @@ class _RadioAlertDialogState extends State<RadioAlertDialog> {
                 )
             )
           ),
-          SizedBox(
+          new Container(
+            color: Colors.grey[50],
+            child: new Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                new FlatButton(
+                  child: new Text(
+                    'Cancel',
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16.0
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  padding: EdgeInsets.all(0.0),
+                ),
+                new FlatButton(
+                  child: new Text(
+                    'Confirm',
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16.0
+                    ),
+                  ),
+                  onPressed: () {
+                    setSharedPrefs();
+                    Navigator.of(context).pop();
+                  },
+                  padding: EdgeInsets.all(0.0),
+                ),
+              ],
+            ),
+          )
+          /*SizedBox(
             height: 5.0,
             child: Container(
               color: Colors.grey[50],
@@ -246,7 +297,7 @@ class _RadioAlertDialogState extends State<RadioAlertDialog> {
               //elevation: 0.0,
               //highlightElevation: 0.0,
             ),
-          ),
+          ),*/
         ]
     );
   }

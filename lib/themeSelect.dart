@@ -4,6 +4,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import 'query.dart';
 import 'fontStyles.dart';
@@ -190,7 +191,7 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
       alignment: Alignment.centerLeft,
       child: new Text(
         headings[index],
-        style: const TextStyle(color: Colors.white),
+        style: const TextStyle(color: Colors.white, fontSize: 18.0),
       ),
     );
   }
@@ -280,31 +281,49 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
             break;
           }
           case 'Random Custom Theme': {
-            String randomTheme = randomKey(customThemesMap);
-            Navigator.of(context).push(
+            if (customThemesMap.isNotEmpty) {
+              String randomTheme = randomKey(customThemesMap);
+              Navigator.of(context).push(
                 new QueryOrTimerPageRoute(
-                    title: randomTheme,
-                    terms: customThemesMap[randomTheme],
-                    mode: mode,
-                    alertChoice: alertChoice,
+                  title: randomTheme,
+                  terms: customThemesMap[randomTheme],
+                  mode: mode,
+                  alertChoice: alertChoice,
                 )
-            );
+              );
+            } else {
+              Fluttertoast.showToast(
+                msg: "No Custom Themes Available",
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.BOTTOM,
+                timeInSecForIos: 1,
+              );
+            }
             break;
           }
           case 'Random Words From Custom Themes': {
-            List<String> randomWords = [];
-            for (int i=0; i<8; i++) {
-              List<String> randomValues = randomValFromMap(customThemesMap);
-              randomWords.add(randomValFromList(randomValues));
-            }
-            Navigator.of(context).push(
-                new QueryOrTimerPageRoute(
+            if (customThemesMap.isNotEmpty) {
+              List<String> randomWords = [];
+              for (int i = 0; i < 8; i++) {
+                List<String> randomValues = randomValFromMap(customThemesMap);
+                randomWords.add(randomValFromList(randomValues));
+              }
+              Navigator.of(context).push(
+                  new QueryOrTimerPageRoute(
                     title: 'Random Custom Words',
                     terms: randomWords,
                     mode: mode,
                     alertChoice: alertChoice,
-                )
-            );
+                  )
+              );
+            } else {
+              Fluttertoast.showToast(
+                msg: "No Custom Themes Available",
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.BOTTOM,
+                timeInSecForIos: 1,
+              );
+            }
             break;
           }
         }

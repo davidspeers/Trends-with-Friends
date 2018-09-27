@@ -35,7 +35,7 @@ void main() {
 
 //Adding this as a behaviour removes the default blue glow when overscrolling a ListView on android.
 //Then I can add my own custom color without it mixing with the blue. Using GlowingOverscrollIndicator
-class removeListGlowingOverscroll extends ScrollBehavior {
+class RemoveListGlowingOverscroll extends ScrollBehavior {
   @override
   Widget buildViewportChrome(
       BuildContext context, Widget child, AxisDirection axisDirection) {
@@ -53,7 +53,7 @@ class MyApp extends StatelessWidget {
       title: 'Google Trends Game',
       builder: (context, child) {
         return ScrollConfiguration(
-          behavior: removeListGlowingOverscroll(),
+          behavior: RemoveListGlowingOverscroll(),
           child: child,
         );
       },
@@ -324,21 +324,18 @@ class AnimatedHomeState extends State<AnimatedHome> with TickerProviderStateMixi
     String selectionTextHeading;
     List<String> listChoices;
     double choiceFontSize;
-    Color myColor;
 
     switch (mode) {
       case "Party Mode": {
         selectionTextHeading = "Number of Players:";
         listChoices = ['2', '3', '4', '5'];
         choiceFontSize = 18.0;
-        myColor = partyButtonBg;
         break;
       }
       case "CPU Mode": {
         selectionTextHeading = "Difficulty:";
         listChoices = ['Easy', 'Normal', 'Hard', 'Impossible'];
         choiceFontSize = 14.0;
-        myColor = cpuButtonBg;
         break;
       }
       default: {

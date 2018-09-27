@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'dart:collection'; //Needed for LinkedHashMap (which is needed to maintain forEach order)
 import 'fontStyles.dart';
-import 'globals.dart';
 
 List<String> userAnswers;
 

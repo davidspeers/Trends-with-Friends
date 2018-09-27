@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'finalScore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'customWidgets.dart';
 import 'functions.dart';
@@ -10,7 +9,6 @@ import 'globals.dart' as globals;
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'barChart.dart';
 import 'timeGraph.dart';
@@ -225,7 +223,7 @@ class _ResultsPageState extends State<ResultsPage> {
       bottom: TabBar(
           tabs: myTabs
       ),
-      leading: CustomBackIcon(
+      leading: customBackIcon(
         context,
         backToQueries
       ),

@@ -236,7 +236,7 @@ class TimerPageState extends State<TimerPage> with TickerProviderStateMixin {
       },
       child: Scaffold(
         appBar: new AppBar(
-          leading: AlertBackIcon(
+          leading: alertBackIcon(
             context,
             message,
             modalRouteName

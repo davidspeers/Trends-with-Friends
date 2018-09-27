@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:async';
-import 'globals.dart' as globals;
 
 import 'themeSelect.dart';
 import 'query.dart';
@@ -62,17 +61,12 @@ class QueryPageRoute extends CupertinoPageRoute {
       : super(
     //WillPopScope stops the swipe left to go back feature
       builder: (BuildContext context) {
-        return new WillPopScope(
-          onWillPop: () async {
-            return false;
-          },
-          child: new QueryPage(
-            title: title,
-            terms: terms,
-            futureTerms: futureTerms,
-            mode: mode,
-            alertChoice: alertChoice,
-          ),
+        return new QueryPage(
+          title: title,
+          terms: terms,
+          futureTerms: futureTerms,
+          mode: mode,
+          alertChoice: alertChoice,
         );
       },
       settings: RouteSettings(name: "/Query")

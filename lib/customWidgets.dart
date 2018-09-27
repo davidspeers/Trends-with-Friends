@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'fontStyles.dart';
 import 'globals.dart' as globals;
 
-Widget HomeIcon(BuildContext context) {
+Widget homeIcon(BuildContext context) {
   var backIcon;
   switch(Theme.of(context).platform) {
     case TargetPlatform.iOS:
@@ -34,7 +33,7 @@ Widget HomeIcon(BuildContext context) {
 
 }
 
-Widget AlertBackIcon(BuildContext context, String message, String modalRouteName) {
+Widget alertBackIcon(BuildContext context, String message, String modalRouteName) {
   var backIcon;
   switch(Theme.of(context).platform) {
     case TargetPlatform.iOS:
@@ -101,7 +100,7 @@ Widget AlertBackIcon(BuildContext context, String message, String modalRouteName
   );
 }
 
-Widget CustomBackIcon(BuildContext context, VoidCallback customOnPressed) {
+Widget customBackIcon(BuildContext context, VoidCallback customOnPressed) {
   var backIcon;
   switch(Theme.of(context).platform) {
     case TargetPlatform.iOS:
@@ -177,14 +176,14 @@ void createSnackBar(String text, BuildContext context) {
   Scaffold.of(context).showSnackBar(snackBar);
 }
 
-void createInteractiveSnackBar(String text, BuildContext context, SnackBarAction SBAction) {
+void createInteractiveSnackBar(String text, BuildContext context, SnackBarAction sbAction) {
   final snackBar = SnackBar(
     content: Text(
       text,
       textAlign: TextAlign.center,
     ),
     duration: const Duration(seconds: 6),
-    action: SBAction,
+    action: sbAction,
   );
 
   Scaffold.of(context).showSnackBar(snackBar);

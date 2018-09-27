@@ -5,7 +5,6 @@ import 'fontStyles.dart';
 import 'globals.dart' as globals;
 
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 class FinalScorePage extends StatefulWidget {
   FinalScorePage({Key key, this.title, this.scores, this.mode}) : super(key: key);
@@ -140,7 +139,7 @@ class _FinalScorePageState extends State<FinalScorePage> {
       },
       child: new Scaffold(
         appBar: new AppBar(
-          leading: HomeIcon(context),
+          leading: homeIcon(context),
           title: new Text(widget.title),
           backgroundColor: Colors.blue,
         ),

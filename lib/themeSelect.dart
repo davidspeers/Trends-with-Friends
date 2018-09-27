@@ -6,8 +6,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-import 'query.dart';
-import 'fontStyles.dart';
 import 'routes.dart';
 import 'customWidgets.dart';
 import 'package:flutter/cupertino.dart';
@@ -26,12 +24,6 @@ class ThemeSelectPage extends StatefulWidget {
   @override
   _ThemeSelectPageState createState() => new _ThemeSelectPageState();
 }
-
-// At the top level:
-enum SingingCharacter { lafayette, jefferson }
-
-// In the State of a stateful widget:
-SingingCharacter _character = SingingCharacter.lafayette;
 
 class _ThemeSelectPageState extends State<ThemeSelectPage> {
   //List<String> themes = ["TV", "Movies", "Politics", "Harry Potter", "Future", "Muppets", "Animals"];

@@ -3,8 +3,6 @@ import 'package:flutter/gestures.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:async';
 
-import 'fontStyles.dart';
-
 class AboutPage extends StatefulWidget {
   AboutPage({Key key, this.title}) : super(key: key);
 
@@ -108,11 +106,9 @@ class CustomExpansionTileState extends State<CustomExpansionTile> {
 
   bool _isInitiallyExpanded(String title) {
     bool returnedVal;
-    (title == 'How to Play') ? (returnedVal = true) : (returnedVal = false);
+    (title == 'How to Play') ? returnedVal = true : returnedVal = false;
     return returnedVal;
   }
-
-  Future<Null> _launched;
 
   Future<Null> _launchInBrowser(String url) async {
     if (await canLaunch(url)) {
@@ -122,7 +118,7 @@ class CustomExpansionTileState extends State<CustomExpansionTile> {
     }
   }
 
-  Future<Null> _launchInWebViewOrVC(String url) async {
+  /*Future<Null> _launchInWebViewOrVC(String url) async {
     if (await canLaunch(url)) {
       await launch(url, forceSafariVC: true, forceWebView: true);
     } else {
@@ -136,7 +132,7 @@ class CustomExpansionTileState extends State<CustomExpansionTile> {
     } else {
       return const Text('');
     }
-  }
+  }*/
 
   Widget _buildTiles(Entry root) {
     if (root.children.isEmpty) {
@@ -166,7 +162,7 @@ class CustomExpansionTileState extends State<CustomExpansionTile> {
                 ),
                 recognizer: new TapGestureRecognizer()
                   ..onTap = () => setState(() {
-                    _launched = _launchInBrowser('https://www.youtube.com/watch?v=n9bqcK-nVRk&t=120s');
+                    _launchInBrowser('https://www.youtube.com/watch?v=n9bqcK-nVRk&t=120s');
                   }),
               ),
             );
@@ -226,7 +222,7 @@ class CustomExpansionTileState extends State<CustomExpansionTile> {
         new FutureBuilder<Null>(future: _launched, builder: _launchStatus),
       ],*/
       onExpansionChanged: (bool expanding) => setState(() {
-        isInitiallyExpanded ? (isExpandedAgain = expanding) : (isExpanded = expanding);
+        isInitiallyExpanded ? isExpandedAgain = expanding : isExpanded = expanding;
       }),
       initiallyExpanded: isInitiallyExpanded
     );

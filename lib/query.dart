@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'routes.dart';
 
-import 'result.dart';
 import 'customWidgets.dart';
 import 'functions.dart';
 import 'fontStyles.dart';
@@ -214,7 +213,7 @@ class _QueryPageState extends State<QueryPage> {
 
     String message = 'Are you sure you want to go back?\nAll progress will be lost.';
     String modalRouteName = '/SelectTheme';
-    Widget backButton = AlertBackIcon(
+    Widget backButton = alertBackIcon(
         context,
         message,
         modalRouteName

@@ -410,35 +410,82 @@ class _ResultsPageState extends State<ResultsPage> {
       }
     }
 
-    List<Widget> myChildren = [];
+    if (allQueries.length < 4) {
+      List<Widget> myChildren = [];
 
-    for (int i=0; i<messages.length; i++) {
-      myChildren.add(
-          new Expanded(
-              child: Container(
-                color: colors[i],
-                width: double.infinity,
-                alignment: Alignment.center,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    new Flexible(child: Text(messages[i], style: whiteTextBlack)),
-                    new Flexible(child: Text(
-                      "${allQueries[i]}: ${jsonResponse.weeklyVals.last[i].toString()}"
-                          "\nTotal: ${addLists(results, globals.totals)[i]}",
-                      style: whiteTextSmallBlack,
-                      textAlign: TextAlign.center,
-                    )),
-                  ],
-                ),
-              )
-          )
+      for (int i=0; i<messages.length; i++) {
+        myChildren.add(
+            new Expanded(
+                child: Container(
+                  color: colors[i],
+                  width: double.infinity,
+                  alignment: Alignment.center,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      new Flexible(child: Text(messages[i], style: whiteTextBlack)),
+                      new Flexible(child: Text(
+                        "${allQueries[i]}: ${jsonResponse.weeklyVals.last[i].toString()}"
+                            "\nTotal: ${addLists(results, globals.totals)[i]}",
+                        style: whiteTextSmallBlack,
+                        textAlign: TextAlign.center,
+                      )),
+                    ],
+                  ),
+                )
+            )
+        );
+      }
+
+      return Column(
+          children: myChildren
       );
+    } else {
+      switch (widget.mode) {
+        case ("Party Mode"): {
+          return new ListView.builder(
+            itemBuilder: (context, index) {
+              return new Container(
+                  color: colors[index],
+                  child: ListTile(
+                    title: new Text("Team ${index+1}:", style: whiteTextBlack,),
+                    subtitle: new Text(
+                        "${widget.queries[index]}: ${jsonResponse.weeklyVals.last[index].toString()}"
+                            "\nTotal: ${globals.totals[index]}",
+                        style: whiteTextSmallBlack
+                    ),
+                  )
+              );
+            },
+            itemCount: globals.totals.length,
+          );
+        }
+
+        case ("CPU Mode"): {
+          List<String> messages = ["Your Answer:", "CPU Answer:"];
+          List<String> allQueries = [widget.queries[0], toTitleCase(jsonResponse.cpuAnswer)];
+          return new ListView.builder(
+            itemBuilder: (context, index) {
+              return new Container(
+                  color: colors[index],
+                  child: ListTile(
+                    title: new Text(messages[index], style: whiteTextBlack),
+                    subtitle: new Text(
+                        "${allQueries[index]}: ${jsonResponse.weeklyVals.last[index].toString()}"
+                            "\nTotal: ${globals.totals[index]}",
+                        style: whiteTextSmallBlack
+                    ),
+                  )
+              );
+            },
+            itemCount: globals.totals.length,
+          );
+        }
+
+        default: {
+          return new Text("Error - mode not of expected type");
+        }
+      }
     }
-
-    return Column(
-        children: myChildren
-    );
-
   }
 }

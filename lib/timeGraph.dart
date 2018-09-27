@@ -127,7 +127,7 @@ class _SelectionCallbackState extends State<TimeSeriesCallbackChart> {
   // chart.
   _onSelectionChanged(charts.SelectionModel model) {
     final selectedDatum = model.selectedDatum;
-    print('[[[[[[' + model.selectedSeries[0].id);
+    //print('[[[[[[' +model.selectedSeries[0].id);
 
     DateTime time;
     final LinkedHashMap<String, num> measures = new LinkedHashMap();
@@ -139,11 +139,11 @@ class _SelectionCallbackState extends State<TimeSeriesCallbackChart> {
     // series name for each selection point.
     if (selectedDatum.isNotEmpty) {
       time = selectedDatum.first.datum.time;
-      print('------------' + selectedDatum.toString());
-      print(';;;;;;;' + selectedDatum[0].datum.score.toString());
-      print(';;;;;;;' + selectedDatum[0].series.toString());
-      print(';;;;;;;' + selectedDatum[0].hashCode.toString());
-      print(';;;;;;;' + selectedDatum[0].datum.toString());
+      //print('------------' + selectedDatum.toString());
+      //print(';;;;;;;' + selectedDatum[0].datum.score.toString());
+      //print(';;;;;;;' + selectedDatum[0].series.toString());
+      //print(';;;;;;;' + selectedDatum[0].hashCode.toString());
+      //print(';;;;;;;' + selectedDatum[0].datum.toString());
       selectedDatum.forEach((charts.SeriesDatum datumPair) {
         measures[datumPair.series.displayName] = datumPair.datum.score;
       });

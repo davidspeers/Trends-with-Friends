@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'dart:async';
 import 'globals.dart' as globals;
 import 'routes.dart';
+import 'customWidgets.dart';
 
 class TimerPage extends StatefulWidget {
   TimerPage({Key key, this.title, this.terms, this.futureTerms, this.mode, this.alertChoice}) : super(key: key);
@@ -18,18 +19,13 @@ class TimerPage extends StatefulWidget {
 }
 
 class TimerPageState extends State<TimerPage> with TickerProviderStateMixin {
-  AnimationController controller;
+  //AnimationController controller;
 
-  List<int> timerTimes = [0, 15, 30, 45, 60];
-  bool hasAnimationStarted = false;
+  List<int> timerTimes = [0, 14, 29, 44, 59];
 
   String get timerString {
-    Duration duration = controller.duration * controller.value;
+    Duration duration = globals.controller.duration * globals.controller.value;
     return '${(duration.inSeconds+1).toString()}';//.padLeft(2, '0')}';
-  }
-
-  Future sleep1() {
-    return new Future.delayed(const Duration(seconds: 1), () => controller.reset());
   }
 
   _pushQuery() {
@@ -44,32 +40,26 @@ class TimerPageState extends State<TimerPage> with TickerProviderStateMixin {
     //hasAnimationStarted = false;
   }
 
-  resetAnimation() {
-    hasAnimationStarted = false;
-    controller.reset();
-  }
-
   @override
   void initState() {
+    globals.hasAnimationStarted = false;
     super.initState();
-    controller = AnimationController(
+    globals.controller = AnimationController(
       vsync: this,
       duration: Duration(seconds: timerTimes[globals.timerSetting]),
     );
-    controller.addStatusListener((status) {
+    globals.controller.addStatusListener((status) {
       //I think the controller is operating in reverse,
       //therefore we use dismissed not completed
       if (status == AnimationStatus.dismissed) {
         _pushQuery();
       }
     });
-    //Reset animation after QueryPage has been fully loaded
-    WidgetsBinding.instance.addPostFrameCallback((_) => resetAnimation());
   }
 
   @override
   void dispose() {
-    controller.dispose();
+    globals.controller.dispose();
     super.dispose();
   }
 
@@ -116,11 +106,11 @@ class TimerPageState extends State<TimerPage> with TickerProviderStateMixin {
               children: <Widget>[
                 Positioned.fill(
                   child: AnimatedBuilder(
-                    animation: controller,
+                    animation: globals.controller,
                     builder: (BuildContext context, Widget child) {
                       return new CustomPaint(
                           painter: TimerPainter(
-                            animation: controller,
+                            animation: globals.controller,
                             backgroundColor: Colors.white,
                             color: themeData.indicatorColor,
                           ));
@@ -134,11 +124,11 @@ class TimerPageState extends State<TimerPage> with TickerProviderStateMixin {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       AnimatedBuilder(
-                          animation: controller,
+                          animation: globals.controller,
                           builder: (BuildContext context, Widget child) {
-                            if (controller.status == AnimationStatus.dismissed && !hasAnimationStarted) {
+                            if (globals.controller.status == AnimationStatus.dismissed && !globals.hasAnimationStarted) {
                               return new Text(
-                                timerTimes[globals.timerSetting].toString(),
+                                (timerTimes[globals.timerSetting]+1).toString(),
                                 style: themeData.textTheme.display4,
                               );
                             } else {
@@ -167,29 +157,31 @@ class TimerPageState extends State<TimerPage> with TickerProviderStateMixin {
             children: <Widget>[
               FloatingActionButton(
                 child: AnimatedBuilder(
-                  animation: controller,
+                  animation: globals.controller,
                   builder: (BuildContext context, Widget child) {
-                    return new Icon(controller.isAnimating
+                    return new Icon(globals.controller.isAnimating
                         ? Icons.pause
                         : Icons.play_arrow);
                   },
                 ),
                 onPressed: () {
-                  hasAnimationStarted = true;
-                  if (controller.isAnimating)
-                    controller.stop();
+                  globals.hasAnimationStarted = true;
+                  if (globals.controller.isAnimating)
+                    globals.controller.stop();
                   else {
-                    controller.reverse(
-                        from: controller.value == 0.0
+                    globals.controller.reverse(
+                        from: globals.controller.value == 0.0
                             ? 1.0
-                            : controller.value);
+                            : globals.controller.value);
                   }
                 },
                 heroTag: null,
               ),
               FloatingActionButton(
                 child: Icon(Icons.skip_next),
-                onPressed: () => _pushQuery(),
+                onPressed: () {
+                  _pushQuery();
+                },
                 heroTag: null,
               )
             ],
@@ -197,31 +189,80 @@ class TimerPageState extends State<TimerPage> with TickerProviderStateMixin {
         )
     );
 
-    return Scaffold(
-      appBar: new AppBar(
-        title: new Text('Timer'),
-        backgroundColor: Colors.blue,
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(8.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: myChildren
+    String message = 'Are you sure you want to go back?\nAll progress will be lost.';
+    String modalRouteName = '/SelectTheme';
+
+    return WillPopScope(
+      onWillPop: () {
+        showDialog<Null>(
+          context: context,
+          //barrierDismissible: false, // outside click dismisses alert
+          builder: (BuildContext context) {
+            return new AlertDialog(
+              title: new Text(message),
+              titlePadding: EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
+              actions: <Widget>[
+                new FlatButton(
+                  child: new Text(
+                    'Cancel',
+                    style: TextStyle(
+                        color: Colors.blue,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16.0
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                new FlatButton(
+                  child: new Text(
+                    'Confirm',
+                    style: TextStyle(
+                        color: Colors.blue,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16.0
+                    ),
+                  ),
+                  onPressed: () {
+                    //Look at main.dart to see how I routes to name the desired ModalRoute
+                    Navigator.popUntil(context, ModalRoute.withName(modalRouteName));
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+      child: Scaffold(
+        appBar: new AppBar(
+          leading: AlertBackIcon(
+            context,
+            message,
+            modalRouteName
+          ),
+          title: new Text('Timer'),
+          backgroundColor: Colors.blue,
         ),
-      ),
+        body: Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: myChildren
+          ),
+        ),
+      )
     );
   }
 }
 
 class TimerPainter extends CustomPainter {
-  TimerPainter({
-    this.animation,
-    this.backgroundColor,
-    this.color,
-  }) : super(repaint: animation);
-
   final Animation<double> animation;
-  final Color backgroundColor, color;
+  final Color backgroundColor;
+  final Color color;
+
+  TimerPainter({this.animation, this.backgroundColor, this.color})
+      : super(repaint: animation);
 
   @override
   void paint(Canvas canvas, Size size) {

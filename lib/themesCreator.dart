@@ -43,8 +43,8 @@ class _AddThemePageState extends State<AddThemePage> {
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
             timeInSecForIos: 1,
-            bgcolor: "#e74c3c",
-            textcolor: '#ffffff'
+            //bgcolor: "#e74c3c",
+            //textcolor: '#ffffff'
         );
       }
       prefs.setInt("Number of Created Themes", numCreatedThemes);
@@ -54,8 +54,8 @@ class _AddThemePageState extends State<AddThemePage> {
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
           timeInSecForIos: 1,
-          bgcolor: "#e74c3c",
-          textcolor: '#ffffff'
+          //bgcolor: "#e74c3c",
+          //textcolor: '#ffffff'
       );
     }
   }

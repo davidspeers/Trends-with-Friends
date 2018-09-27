@@ -171,6 +171,7 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
                     child: new Text(
                       lists[sliverIndex][i],
                       style: const TextStyle(color: Colors.black, fontSize: 16.0),
+                      textAlign: TextAlign.center,
                     ),
                   ),
                 ),
@@ -221,14 +222,25 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
         globals.isRandomTheme = false;
         globals.isCustomTheme = false;
         globals.chosenThemeName = myLists[headingIndex][index];
-        Navigator.of(context).push(
-          new QueryOrTimerPageRoute(
-            title: myLists[headingIndex][index],
-            terms: globals.myThemesMap[myLists[headingIndex][index]],
-            mode: mode,
-            alertChoice: alertChoice
-          )
-        );
+        if (globals.timerSetting == 0) {
+          Navigator.of(context).push(
+              new QueryPageRoute(
+                  title: myLists[headingIndex][index],
+                  terms: globals.myThemesMap[myLists[headingIndex][index]],
+                  mode: mode,
+                  alertChoice: alertChoice
+              )
+          );
+        } else {
+          Navigator.of(context).push(
+              new TimerPageRoute(
+                  title: myLists[headingIndex][index],
+                  terms: globals.myThemesMap[myLists[headingIndex][index]],
+                  mode: mode,
+                  alertChoice: alertChoice
+              )
+          );
+        }
         break;
       }
       case "Random Themes": {
@@ -242,26 +254,48 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
         switch (myLists[headingIndex][index]) {
           case 'Random Nouns': {
             Future<List<String>> randomWords = getRandomWords();
-            Navigator.of(context).push(
-              new QueryOrTimerPageRoute(
-                title: myLists[headingIndex][index],
-                futureTerms: randomWords,
-                mode: mode, alertChoice:
+            if (globals.timerSetting == 0) {
+              Navigator.of(context).push(
+                new QueryPageRoute(
+                  title: myLists[headingIndex][index],
+                  futureTerms: randomWords,
+                  mode: mode, alertChoice:
                 alertChoice,
-              )
-            );
+                )
+              );
+            } else {
+              Navigator.of(context).push(
+                new TimerPageRoute(
+                  title: myLists[headingIndex][index],
+                  futureTerms: randomWords,
+                  mode: mode, alertChoice:
+                alertChoice,
+                )
+              );
+            }
             break;
           }
           case 'Random Show Theme': {
             String randomTheme = randomKey(globals.myThemesMap);
-            Navigator.of(context).push(
-              new QueryOrTimerPageRoute(
-                title: randomTheme,
-                terms: globals.myThemesMap[randomTheme],
-                mode: mode,
-                alertChoice: alertChoice,
-              )
-            );
+            if (globals.timerSetting == 0) {
+              Navigator.of(context).push(
+                new QueryPageRoute(
+                  title: randomTheme,
+                  terms: globals.myThemesMap[randomTheme],
+                  mode: mode,
+                  alertChoice: alertChoice,
+                )
+              );
+            } else {
+              Navigator.of(context).push(
+                new TimerPageRoute(
+                  title: randomTheme,
+                  terms: globals.myThemesMap[randomTheme],
+                  mode: mode,
+                  alertChoice: alertChoice,
+                )
+              );
+            }
             break;
           }
           case 'Random Words From Show Themes': {
@@ -270,27 +304,49 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
               List<String> randomValues = randomValFromMap(globals.myThemesMap);
               randomWords.add(randomValFromList(randomValues));
             }
-            Navigator.of(context).push(
-                new QueryOrTimerPageRoute(
-                    title: 'Random Show Words',
-                    terms: randomWords,
-                    mode: mode,
-                    alertChoice: alertChoice,
+            if (globals.timerSetting == 0) {
+              Navigator.of(context).push(
+                new QueryPageRoute(
+                  title: 'Random Show Words',
+                  terms: randomWords,
+                  mode: mode,
+                  alertChoice: alertChoice,
                 )
-            );
+              );
+            } else {
+              Navigator.of(context).push(
+                new TimerPageRoute(
+                  title: 'Random Show Words',
+                  terms: randomWords,
+                  mode: mode,
+                  alertChoice: alertChoice,
+                )
+              );
+            }
             break;
           }
           case 'Random Custom Theme': {
             if (customThemesMap.isNotEmpty) {
               String randomTheme = randomKey(customThemesMap);
-              Navigator.of(context).push(
-                new QueryOrTimerPageRoute(
-                  title: randomTheme,
-                  terms: customThemesMap[randomTheme],
-                  mode: mode,
-                  alertChoice: alertChoice,
-                )
-              );
+              if (globals.timerSetting == 0) {
+                Navigator.of(context).push(
+                  new QueryPageRoute(
+                    title: randomTheme,
+                    terms: customThemesMap[randomTheme],
+                    mode: mode,
+                    alertChoice: alertChoice,
+                  )
+                );
+              } else {
+                Navigator.of(context).push(
+                  new TimerPageRoute(
+                    title: randomTheme,
+                    terms: customThemesMap[randomTheme],
+                    mode: mode,
+                    alertChoice: alertChoice,
+                  )
+                );
+              }
             } else {
               Fluttertoast.showToast(
                 msg: "No Custom Themes Available",
@@ -308,14 +364,25 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
                 List<String> randomValues = randomValFromMap(customThemesMap);
                 randomWords.add(randomValFromList(randomValues));
               }
-              Navigator.of(context).push(
-                  new QueryOrTimerPageRoute(
+              if (globals.timerSetting == 0) {
+                Navigator.of(context).push(
+                  new QueryPageRoute(
                     title: 'Random Custom Words',
                     terms: randomWords,
                     mode: mode,
                     alertChoice: alertChoice,
                   )
-              );
+                );
+              } else {
+                Navigator.of(context).push(
+                  new TimerPageRoute(
+                    title: 'Random Custom Words',
+                    terms: randomWords,
+                    mode: mode,
+                    alertChoice: alertChoice,
+                  )
+                );
+              }
             } else {
               Fluttertoast.showToast(
                 msg: "No Custom Themes Available",
@@ -334,14 +401,25 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
         globals.isRandomTheme = false;
         globals.isCustomTheme = true;
         globals.chosenThemeName = myLists[headingIndex][index];
-        Navigator.of(context).push(
-          new QueryOrTimerPageRoute(
-            title: myLists[headingIndex][index],
-            terms: customThemesMap[myLists[headingIndex][index]],
-            mode: mode,
-            alertChoice: alertChoice
-          )
-        );
+        if (globals.timerSetting == 0) {
+          Navigator.of(context).push(
+            new QueryPageRoute(
+              title: myLists[headingIndex][index],
+              terms: customThemesMap[myLists[headingIndex][index]],
+              mode: mode,
+              alertChoice: alertChoice
+            )
+          );
+        } else {
+          Navigator.of(context).push(
+            new TimerPageRoute(
+              title: myLists[headingIndex][index],
+              terms: customThemesMap[myLists[headingIndex][index]],
+              mode: mode,
+              alertChoice: alertChoice
+            )
+          );
+        }
         break;
       }
       default: {
@@ -351,7 +429,7 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
   }
 
   Future<List<String>> getRandomWords() async {
-    String data = await getFileData('assets/csv/word-freq-top4999.csv');
+    String data = await getFileData('assets/csv/most-common-nouns-english.csv');
     List<String> rowsAsList = data.split("\n");
     List<String> randomWords = capitaliseList((rowsAsList..shuffle()).sublist(0, 10));
     print("randomWords - $randomWords");

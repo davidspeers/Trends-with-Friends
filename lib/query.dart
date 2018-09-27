@@ -27,8 +27,10 @@ class QueryPage extends StatefulWidget {
 class _QueryPageState extends State<QueryPage> {
   //Text Controller Retrieves the current value
   final myController = new TextEditingController();
-  final List<Color> bgColors = [Colors.blueAccent[200], Colors.redAccent[200], Colors.yellowAccent[200], Colors.greenAccent[200], Colors.purpleAccent[200]];
-  var bgColor = Colors.blueAccent[200];
+  //final List<Color> bgColors = [Colors.blueAccent[200], Colors.redAccent[200], Colors.yellowAccent[200], Colors.greenAccent[200], Colors.purpleAccent[200]];
+  //var bgColor = Colors.blueAccent[200];
+  final List<Color> bgColors = [Colors.blue[400], Colors.red[400], Colors.yellow[400], Colors.green[400], Colors.purple[300]];
+  var bgColor = Colors.blue[400];
   var fabIconColor = Colors.black12;
   var fabBgColor = Colors.white30;
   var teamNum = 1;
@@ -118,7 +120,7 @@ class _QueryPageState extends State<QueryPage> {
             border: new OutlineInputBorder(
               borderRadius: new BorderRadius.circular(12.0),
             ),
-            hintText: 'Enter Term & Hit Enter or > Button'
+            hintText: 'Enter Term'
         ),
         maxLength: globals.maxTextLength,
         onChanged: (text) {
@@ -142,7 +144,7 @@ class _QueryPageState extends State<QueryPage> {
         0,
         new Text(
           "Team $teamNum",
-          style: whiteText
+          style: whiteTextBlack
         )
       );
     }
@@ -164,7 +166,7 @@ class _QueryPageState extends State<QueryPage> {
                 queryInsertIndex,
                 new Text(
                   "Match 1 word with:\n${convertedTerms[globals.termIndex]}",
-                  style: whiteTextSmall,
+                  style: whiteTextSmallBlack,
                 )
             );
             return new Padding(
@@ -198,7 +200,7 @@ class _QueryPageState extends State<QueryPage> {
           queryInsertIndex,
           new Text(
             "Match 1 word with:\n${convertedTerms[globals.termIndex]}",
-            style: whiteTextSmall,
+            style: whiteTextSmallBlack,
           )
       );
       body = new Padding(
@@ -210,26 +212,75 @@ class _QueryPageState extends State<QueryPage> {
       );
     }
 
+    String message = 'Are you sure you want to go back?\nAll progress will be lost.';
+    String modalRouteName = '/SelectTheme';
+    Widget backButton = AlertBackIcon(
+        context,
+        message,
+        modalRouteName
+    );
 
 
-    return Scaffold(
-      appBar: new AppBar(
-        leading: homeIcon(context),
-        title: new Text(widget.title),
-        backgroundColor: Colors.blue,
-      ),
-      body: body,
-      backgroundColor: bgColor,
-      floatingActionButton: new FloatingActionButton(
-        // When the user presses the button, show an alert dialog with the
-        // text the user has typed into our text field.
-        // The async and await stuff is there so that the widget doesn't update
-        // until the widget is popped back. There may be a better way of doing this.
-        onPressed: () => submitWord(),
-        tooltip: 'Show me the value!',
-        child: new Icon(Icons.send, color: fabIconColor,),
-        backgroundColor: fabBgColor,
-      ),
+    return new WillPopScope(
+        onWillPop: () {
+          showDialog<Null>(
+            context: context,
+            //barrierDismissible: false, // outside click dismisses alert
+            builder: (BuildContext context) {
+              return new AlertDialog(
+                title: new Text(message),
+                titlePadding: EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
+                actions: <Widget>[
+                  new FlatButton(
+                    child: new Text(
+                      'Cancel',
+                      style: TextStyle(
+                          color: Colors.blue,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16.0
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  new FlatButton(
+                    child: new Text(
+                      'Confirm',
+                      style: TextStyle(
+                          color: Colors.blue,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16.0
+                      ),
+                    ),
+                    onPressed: () {
+                      //Look at main.dart to see how I routes to name the desired ModalRoute
+                      Navigator.popUntil(context, ModalRoute.withName(modalRouteName));
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        },
+        child: Scaffold(
+        appBar: new AppBar(
+          leading: backButton,
+          title: new Text(widget.title),
+          backgroundColor: Colors.blue,
+        ),
+        body: body,
+        backgroundColor: bgColor,
+        floatingActionButton: new FloatingActionButton(
+          // When the user presses the button, show an alert dialog with the
+          // text the user has typed into our text field.
+          // The async and await stuff is there so that the widget doesn't update
+          // until the widget is popped back. There may be a better way of doing this.
+          onPressed: () => submitWord(),
+          child: new Icon(Icons.send, color: fabIconColor,),
+          backgroundColor: fabBgColor,
+        ),
+      )
     );
 
   }

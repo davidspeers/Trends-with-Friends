@@ -134,31 +134,38 @@ class _FinalScorePageState extends State<FinalScorePage> {
   }
 
   Widget _scorePageUI() {
-    return new Scaffold(
-      appBar: new AppBar(
-        leading: homeIcon(context),
-        title: new Text('Retrieve Text Input ${widget.title}'),
-      ),
-      body: new Builder(builder: (BuildContext context) {
-        _scaffoldContext = context;
-        return new Center(
-          child: new Container(
+    return new WillPopScope(
+      onWillPop: () {
+        Navigator.popUntil(context, ModalRoute.withName('/'));
+      },
+      child: new Scaffold(
+        appBar: new AppBar(
+          leading: HomeIcon(context),
+          title: new Text(widget.title),
+          backgroundColor: Colors.blue,
+        ),
+        body: new Builder(builder: (BuildContext context) {
+          _scaffoldContext = context;
+          return new Center(
+            child: new Container(
               child: new Text(
-                  getWinners(globals.totals),
-                  textAlign: TextAlign.center,
-                  style: blackTextBold
+                getWinners(globals.totals),
+                textAlign: TextAlign.center,
+                style: blackTextBold
               ),
               width: double.infinity,
               color: Colors.amber
-          ),
-        );
-      }),
-      backgroundColor: getWinningColor(globals.totals),
+            ),
+          );
+        }),
+        backgroundColor: getWinningColor(globals.totals),
+      ),
     );
   }
 
   Color getWinningColor(List<int> scores) {
-    final List<Color> colors = [Colors.blue, Colors.red, Colors.yellow, Colors.green, Colors.purple];
+    final List<Color> colors = [Colors.blue[400], Colors.red[400], Colors.yellow[400], Colors.green[400], Colors.purple[300]];
+
     List<int> winningIndex = getWinnersIndex(scores);
     if (winningIndex.length>1) return Colors.black;
     else return colors[winningIndex[0]];
@@ -180,8 +187,8 @@ class _FinalScorePageState extends State<FinalScorePage> {
       case ("CPU Mode"): {
         if (winningIndex.length>1) winners = "You Drew The Computer";
         else {
-          if (winningIndex[0]==0) winners = "Congratulations, You Beat The Goog";
-          else winners = "You Lost To The Goog\nTry Again";
+          if (winningIndex[0]==0) winners = "Congratulations\nYou Won";
+          else winners = "You Lost\nTry Again";
         }
         break;
       }

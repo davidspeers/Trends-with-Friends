@@ -19,10 +19,19 @@ import 'globals.dart' as globals;
 
 import 'routes.dart';
 
+import 'package:flutter/services.dart';
+
 String txt = "If this is your first time playing Trends With Friends - welcome..."
     "or you've never used GT before we recommend you press the ? and read the How To Play section";
 
-void main() => runApp(new MyApp());
+//void main() => runApp(new MyApp());
+//Maintains orientation
+void main() {
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+      .then((_) {
+    runApp(new MyApp());
+  });
+}
 
 //Adding this as a behaviour removes the default blue glow when overscrolling a ListView on android.
 //Then I can add my own custom color without it mixing with the blue. Using GlowingOverscrollIndicator
@@ -49,7 +58,7 @@ class MyApp extends StatelessWidget {
         );
       },
       theme: new ThemeData(
-          primarySwatch: Colors.blue, primaryColor: new Color(0xffd05c6b)),
+          primarySwatch: Colors.blue, primaryColor: Colors.blue),
       home: new AnimatedHome(),
     );
   }
@@ -280,6 +289,7 @@ class AnimatedHomeState extends State<AnimatedHome> with TickerProviderStateMixi
             padding: EdgeInsets.only(top: 30.0),
             child: new AppBar(
               //title: new Text(widget.title),
+              brightness: Brightness.light,
               title: new Image.asset('assets/images/TrendsWithFriendsLogo.png', height: 100.0),
               centerTitle: true,
               elevation: 0.0, //Removes shadow on bottom of appbar

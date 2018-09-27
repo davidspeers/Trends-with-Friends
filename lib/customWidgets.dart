@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'fontStyles.dart';
 import 'globals.dart' as globals;
 
-Widget homeIcon(BuildContext context) {
+Widget HomeIcon(BuildContext context) {
   var backIcon;
   switch(Theme.of(context).platform) {
     case TargetPlatform.iOS:
@@ -27,14 +27,14 @@ Widget homeIcon(BuildContext context) {
   return new IconButton(
     icon: backIcon,
     onPressed: () {
-      FocusScope.of(context).requestFocus(new FocusNode()); //Removes keyboard before going back
+      //FocusScope.of(context).requestFocus(new FocusNode()); //Removes keyboard before going back
       Navigator.popUntil(context, ModalRoute.withName('/'));
     }
   );
 
 }
 
-Widget alertBackIcon(BuildContext context, String message, String modalRouteName) {
+Widget AlertBackIcon(BuildContext context, String message, String modalRouteName) {
   var backIcon;
   switch(Theme.of(context).platform) {
     case TargetPlatform.iOS:
@@ -64,6 +64,7 @@ Widget alertBackIcon(BuildContext context, String message, String modalRouteName
         builder: (BuildContext context) {
           return new AlertDialog(
             title: new Text(message),
+            titlePadding: EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
             actions: <Widget>[
               new FlatButton(
                 child: new Text(
@@ -97,6 +98,33 @@ Widget alertBackIcon(BuildContext context, String message, String modalRouteName
         },
       );
     }
+  );
+}
+
+Widget CustomBackIcon(BuildContext context, VoidCallback customOnPressed) {
+  var backIcon;
+  switch(Theme.of(context).platform) {
+    case TargetPlatform.iOS:
+      {
+        backIcon = new Icon(
+            Icons.arrow_back_ios,
+            color: Colors.white
+        );
+        break;
+      }
+    default:
+      {
+        backIcon = new Icon(
+            Icons.arrow_back,
+            color: Colors.white
+        );
+        break;
+      }
+  }
+
+  return new IconButton(
+      icon: backIcon,
+      onPressed: customOnPressed
   );
 }
 

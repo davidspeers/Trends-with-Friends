@@ -58,3 +58,12 @@ int termIndex = 0;
 List<int> totals = [];
 
 int maxTextLength = 50;
+
+//GlobalValues so I can reset timer after queries loads
+bool hasAnimationStarted;
+AnimationController controller;
+
+resetTimerAnimation() {
+  hasAnimationStarted = false;
+  controller.reset();
+}

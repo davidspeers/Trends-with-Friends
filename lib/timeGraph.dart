@@ -226,6 +226,8 @@ class _SelectionCallbackState extends State<TimeSeriesCallbackChart> {
       );
       i++;
     });*/
+    final List<dynamic> colors = [Colors.blue[400], Colors.red[400], Colors.yellow[400], Colors.green[400], Colors.purple[300]];
+
     int i = 0;
     while (i < _measures.length) {
       String teamName = 'Team ${i+1}';
@@ -233,12 +235,13 @@ class _SelectionCallbackState extends State<TimeSeriesCallbackChart> {
       children.add(
         new Expanded(
           child: Container(
-            color: globalColors[i],
+            color: colors[i],
             width: double.infinity,
             alignment: Alignment.center,
             child: new Text(
-                '${userAnswers[i]}: $value',
-                style: whiteTextSmall,
+              '${userAnswers[i]}: $value',
+              style: whiteTextSmallBlack,
+              textAlign: TextAlign.center,
             ),
           ),
         )

@@ -121,7 +121,7 @@ class ResultsPage extends StatefulWidget {
 
 class _ResultsPageState extends State<ResultsPage> {
 
-  final List<dynamic> colors = [Colors.blue, Colors.red, Colors.yellow, Colors.green, Colors.purple];
+  final List<dynamic> colors = [Colors.blue[400], Colors.red[400], Colors.yellow[400], Colors.green[400], Colors.purple[300]];
 
   List<int> results;
 
@@ -194,57 +194,76 @@ class _ResultsPageState extends State<ResultsPage> {
     //this.fetchedPost = fetchPost(widget.mode, widget.alertChoice, widget.term, widget.queries);
     tabs.forEach((tabName) => myTabContents.add(_buildFuturePostWidget(tabName))); //Tab widget can contain an Icon or a child not just text
 
+    backToQueries() {
+      //Makes sure user doesn't move to next screen before results displayed (stops bug)
+      if (results!=null) {
+        if (globals.timerSetting != 0) {
+          globals.resetTimerAnimation();
+        }
+        globals.totals = addLists(results, globals.totals); //Make sure it's only called once
+        if (!widget.lastQuery) {
+          globals.termIndex++;
+          if (globals.timerSetting == 0) {
+            Navigator.pop(context, results);
+          } else {
+            if (globals.timerSetting == 0) {
+              Navigator.popUntil(context, ModalRoute.withName('/Query'));
+            } else {
+              Navigator.popUntil(context, ModalRoute.withName('/Timer'));
+            }
+          }
+        } else {
+          List<int> finalResults = addLists(results, widget.previousResults);
+          _pushFinalScore(finalResults);
+        }
+      }
+    }
+
     //doing it like this so I can obtain the height
     myAppBar = new AppBar(
       backgroundColor: Colors.blue,
       bottom: TabBar(
           tabs: myTabs
       ),
-      title: Text('Fetch Data Example'),
+      leading: CustomBackIcon(
+        context,
+        backToQueries
+      ),
+      title: Text(widget.title),
     );
 
     return new DefaultTabController(
-        length: tabs.length,
-        child: new Scaffold(
-            appBar: myAppBar,
-            body: new Builder(builder: (BuildContext context) {
-              _scaffoldContext = context;
-              return new TabBarView(
-                children: myTabContents,
-              );
-            }),
-            floatingActionButton: new FloatingActionButton(
-              // When the user presses the button, show an alert dialog with the
-              // text the user has typed into our text field.
-              onPressed: () {
-                //_pushQueries();
-                //Makes sure user doesn't move to next screen before results displayed (stops bug)
-                if (results!=null) {
-                  globals.termIndex++;
-                  globals.totals = addLists(results, globals.totals); //Make sure it's only called once
-                  if (!widget.lastQuery) {
-                    if (globals.timerSetting == 0) {
-                      Navigator.pop(context, results);
-                    } else {
-                      Navigator.popUntil(context, ModalRoute.withName('/QueryOrTimer'));
-                    }
-                  } else {
-                    List<int> finalResults = addLists(results, widget.previousResults);
-                    _pushFinalScore(finalResults);
-                  }
-                }
-              },
-              child: new Icon(Icons.send, color: Colors.black87),
-              backgroundColor: Colors.white70,
-            )
+      length: tabs.length,
+      child: new WillPopScope(
+        onWillPop: () {
+          backToQueries();
+        },
+        child: Scaffold(
+          appBar: myAppBar,
+          body: new Builder(builder: (BuildContext context) {
+            _scaffoldContext = context;
+            return new TabBarView(
+              children: myTabContents,
+            );
+          }),
+          floatingActionButton: new FloatingActionButton(
+            // When the user presses the button, show an alert dialog with the
+            // text the user has typed into our text field.
+            onPressed: () {
+              //_pushQueries();
+              backToQueries();
+            },
+            child: new Icon(Icons.send, color: Colors.black87),
+            backgroundColor: Colors.white70,
+          )
         )
+      )
     );
   }
 
   void _pushFinalScore(List<int> results) {
     Navigator.of(context).push(
         new FinalScorePageRoute(
-          title: "Hello",
           scores: results,
           mode: widget.mode,
         )
@@ -397,17 +416,18 @@ class _ResultsPageState extends State<ResultsPage> {
       myChildren.add(
           new Expanded(
               child: Container(
-                color: globals.globalColors[i],
+                color: colors[i],
                 width: double.infinity,
                 alignment: Alignment.center,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    new Flexible(child: Text(messages[i], style: whiteText)),
+                    new Flexible(child: Text(messages[i], style: whiteTextBlack)),
                     new Flexible(child: Text(
-                        "${allQueries[i]}: ${jsonResponse.weeklyVals.last[i].toString()}"
-                            "\nTotal: ${addLists(results, globals.totals)[i]}",
-                        style: whiteTextSmall
+                      "${allQueries[i]}: ${jsonResponse.weeklyVals.last[i].toString()}"
+                          "\nTotal: ${addLists(results, globals.totals)[i]}",
+                      style: whiteTextSmallBlack,
+                      textAlign: TextAlign.center,
                     )),
                   ],
                 ),

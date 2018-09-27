@@ -19,45 +19,35 @@ class ThemeSelectRoute extends CupertinoPageRoute {
 
   ThemeSelectRoute(this.alertChoice, this.mode)
       : super(
-    builder: (BuildContext context) => new ThemeSelectPage(title: 'Theme Select', alertChoice: alertChoice, mode: mode),
+    builder: (BuildContext context) => new ThemeSelectPage(
+      title: 'Theme Select',
+      alertChoice: alertChoice,
+      mode: mode
+    ),
+    settings: RouteSettings(name: "/SelectTheme")
   );
 }
 
-class QueryOrTimerPageRoute extends CupertinoPageRoute {
+class TimerPageRoute extends CupertinoPageRoute {
   final String title;
   final List<String> terms;
   final Future<List<String>> futureTerms;
   final String mode;
   final dynamic alertChoice;
 
-  QueryOrTimerPageRoute({@required this.title, this.terms, this.futureTerms, @required this.mode, @required this.alertChoice})
+  TimerPageRoute({@required this.title, this.terms, this.futureTerms, @required this.mode, @required this.alertChoice})
       : super(
     //WillPopScope stops the swipe left to go back feature
     builder: (BuildContext context) {
-      if (globals.timerSetting == 0) {
-        return new WillPopScope(
-          onWillPop: () async {
-            return false;
-          },
-          child: new QueryPage(
-            title: title,
-            terms: terms,
-            futureTerms: futureTerms,
-            mode: mode,
-            alertChoice: alertChoice,
-          ),
-        );
-      } else {
-        return new TimerPage(
-          title: title,
-          terms: terms,
-          futureTerms: futureTerms,
-          mode: mode,
-          alertChoice: alertChoice
-        );
-      }
+      return new TimerPage(
+        title: title,
+        terms: terms,
+        futureTerms: futureTerms,
+        mode: mode,
+        alertChoice: alertChoice
+      );
     },
-    settings: RouteSettings(name: "/QueryOrTimer")
+    settings: RouteSettings(name: "/Timer")
   );
 }
 
@@ -84,7 +74,8 @@ class QueryPageRoute extends CupertinoPageRoute {
             alertChoice: alertChoice,
           ),
         );
-      }
+      },
+      settings: RouteSettings(name: "/Query")
   );
 }
 
@@ -118,17 +109,15 @@ class ResultsPageRoute extends CupertinoPageRoute {
 }
 
 class FinalScorePageRoute extends CupertinoPageRoute {
-  final String title;
   final List<int> scores;
   final String mode;
 
   FinalScorePageRoute({
-    @required this.title,
     @required this.scores,
     @required this.mode,
   }) : super(
     builder: (BuildContext context) => new FinalScorePage(
-      title: title,
+      title: 'Final Results',
       scores: scores,
       mode: mode,
     ),

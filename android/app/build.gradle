@@ -47,7 +47,7 @@ android {
     buildTypes {
         release {
 
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
 
             //Do decrease compile time remove the next 3 lines
             minifyEnabled true

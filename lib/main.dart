@@ -50,7 +50,7 @@ class MyApp extends StatelessWidget {
     //ThemeData x = new ThemeData();
     //print(x.scaffoldBackgroundColor);
     return new MaterialApp(
-      title: 'Google Trends Game',
+      title: 'Trends',
       builder: (context, child) {
         return ScrollConfiguration(
           behavior: RemoveListGlowingOverscroll(),

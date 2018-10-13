@@ -445,6 +445,49 @@ class AnimatedHomeState extends State<AnimatedHome> with TickerProviderStateMixi
       )*/
       new Expanded(child: Container()),
       new Padding(
+        padding: EdgeInsets.all(8.0),
+        child: new Card(
+          color: cardColor,
+          elevation: 0.0,//when using translucent colors elevation border can make it look blurred. Also, color loses greyness when set to 0.0
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(30.0))),
+          //decoration: BoxDecoration(color: globalColors[0], borderRadius: BorderRadius.all(Radius.circular(30.0))),
+          // alignment: FractionalOffset.center,
+          child: new Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Row(
+                children: <Widget>[
+                  Expanded(child: Container()),
+                ],
+              ),
+              new Text("Online Mode", style: customFont(color: Colors.black87, fontsize: 12.0)),
+              customIconButton(
+                  iconImage: Icons.play_circle_filled,
+                  size: 60.0, myOnPressed: () async {
+                try {
+                  final result = await InternetAddress.lookup('google.com');
+                  if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+                    //Connected
+                    Navigator.of(context).push(
+                      OnlineLoginRoute()
+                    );
+                  }
+                } on SocketException catch (_) {
+                  Fluttertoast.showToast(
+                    msg: "Internet Connection Required",
+                    toastLength: Toast.LENGTH_SHORT,
+                    gravity: ToastGravity.BOTTOM,
+                    timeInSecForIos: 1,
+                  );
+                }
+              },
+                  mainColor: playButtonColor
+              )
+            ],
+          ),
+        ),
+      ),
+      new Padding(
           padding: EdgeInsets.all(8.0),
           child: stackedButton(mode: "Party Mode")
       ),

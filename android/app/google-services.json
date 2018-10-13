@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "639028185553",
+    "firebase_url": "https://trends-82164.firebaseio.com",
+    "project_id": "trends-82164",
+    "storage_bucket": "trends-82164.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:639028185553:android:d39396698da6d498",
+        "android_client_info": {
+          "package_name": "com.dachsteam.trendswithfriends"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "639028185553-3v6ssv91t6as46422abc8ft11vgk4mh7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.dachsteam.trendswithfriends",
+            "certificate_hash": "899aff57c68650003e83fa56be9e055170becb77"
+          }
+        },
+        {
+          "client_id": "639028185553-v6gh810posms2np993839ase240767vr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDALhMwWfwoGth6Snzds7NvNZeGq8hrQZE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "639028185553-v6gh810posms2np993839ase240767vr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

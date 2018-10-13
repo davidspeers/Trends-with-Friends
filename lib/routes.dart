@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:async';
 
+import 'onlineLogin.dart';
+import 'onlineMode.dart';
 import 'themeSelect.dart';
 import 'query.dart';
 import 'timer.dart';
@@ -11,6 +13,29 @@ import 'about.dart';
 import 'achievements.dart';
 import 'themesCreator.dart';
 import 'themesEditor.dart';
+
+class OnlineLoginRoute extends CupertinoPageRoute {
+
+  OnlineLoginRoute()
+      : super(
+      builder: (BuildContext context) => new OnlineLoginPage(
+          title: 'Login',
+      ),
+      settings: RouteSettings(name: "/OnlineLogin")
+  );
+}
+
+class OnlineModeRoute extends CupertinoPageRoute {
+  final String username;
+
+  OnlineModeRoute(this.username)
+      : super(
+      builder: (BuildContext context) => new OnlineModePage(
+        title: username
+      ),
+      settings: RouteSettings(name: "/OnlineMode")
+  );
+}
 
 class ThemeSelectRoute extends CupertinoPageRoute {
   final alertChoice;

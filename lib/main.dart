@@ -50,6 +50,7 @@ class MyApp extends StatelessWidget {
     //ThemeData x = new ThemeData();
     //print(x.scaffoldBackgroundColor);
     return new MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Trends',
       builder: (context, child) {
         return ScrollConfiguration(
@@ -615,7 +616,7 @@ class AnimatedHomeState extends State<AnimatedHome> with TickerProviderStateMixi
             }
           }
         }
-        Navigator.of(context).push(new ThemeSelectRoute(alertChoice, choice));
+        Navigator.of(context).push(new ThemeSelectRoute(alertChoice: alertChoice, mode: choice));
     }
   }
 }

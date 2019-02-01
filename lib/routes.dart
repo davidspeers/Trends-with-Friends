@@ -2,7 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+
 import 'onlineLogin.dart';
+import 'onlineGame.dart';
+import 'onlineEmailLogin.dart';
 import 'onlineMode.dart';
 import 'themeSelect.dart';
 import 'query.dart';
@@ -25,28 +30,62 @@ class OnlineLoginRoute extends CupertinoPageRoute {
   );
 }
 
+class OnlineEmailLoginRoute extends CupertinoPageRoute {
+  String title;
+  FirebaseAuth auth;
+
+  OnlineEmailLoginRoute(this.title, this.auth)
+      : super(
+      builder: (BuildContext context) => new OnlineEmailLoginPage(
+        title: title,
+        auth: auth
+      ),
+      settings: RouteSettings(name: "/OnlineEmailLogin")
+  );
+}
+
 class OnlineModeRoute extends CupertinoPageRoute {
   final String username;
+  final FirebaseUser user;
 
-  OnlineModeRoute(this.username)
+  OnlineModeRoute(this.username, this.user)
       : super(
       builder: (BuildContext context) => new OnlineModePage(
-        title: username
+        title: username,
+        user: user,
       ),
       settings: RouteSettings(name: "/OnlineMode")
+  );
+}
+
+class OnlineGameRoute extends CupertinoPageRoute {
+  final String category;
+  final List<String> queries;
+
+  OnlineGameRoute(this.category, this.queries)
+      : super(
+      builder: (BuildContext context) => new OnlineGamePage(
+        category: category,
+        queries: queries
+      ),
+      settings: RouteSettings(name: "/OnlineGame")
   );
 }
 
 class ThemeSelectRoute extends CupertinoPageRoute {
   final alertChoice;
   final String mode;
+  final String teamName;
+  final String roomName;
 
-  ThemeSelectRoute(this.alertChoice, this.mode)
+  ThemeSelectRoute({this.alertChoice, @required this.mode, this.teamName, this.roomName})
       : super(
     builder: (BuildContext context) => new ThemeSelectPage(
       title: 'Theme Select',
       alertChoice: alertChoice,
-      mode: mode
+      mode: mode,
+      teamName: teamName,
+      roomName: roomName
     ),
     settings: RouteSettings(name: "/SelectTheme")
   );

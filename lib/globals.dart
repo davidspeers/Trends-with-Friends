@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 final List<Color> globalColors = [Colors.blue, Colors.red, Colors.yellow, Colors.green, Colors.purple];
 
@@ -11,22 +14,29 @@ final Map<Color, Color> globalColorsToAccent = {
 };
 
 Map myThemesMap = {
-  'Government': ['Treason', 'Constitution', 'Spy', 'Hacking', 'Emails', 'Probe', 'Investigation', 'Prison'],
+  //'Government': ['Treason', 'Constitution', 'Spy', 'Hacking', 'Emails', 'Probe', 'Investigation', 'Prison'],
   //'Harassment': ['Harassment', 'Party', '80s', 'Producer', 'Couch', 'Grape', 'Consent', 'Workplace'],
   'Cryptocurrency': ['Coin', 'Block', 'Farm', 'Regulation', 'Payment', 'Mining', 'Hold', 'Chain'],
-  'March Madness': ['Ball', 'Hoop', 'Bracket', 'Seed', 'Division', 'College', 'Region', 'Round'],
-  'Immigration': ['Ethnic', 'Ice', 'Raid', 'Wall', 'Caravan', 'Nuclear', 'Family', 'Dream'],
+  //'March Madness': ['Ball', 'Hoop', 'Bracket', 'Seed', 'Division', 'College', 'Region', 'Round'],
+  //'Immigration': ['Ethnic', 'Ice', 'Raid', 'Wall', 'Caravan', 'Nuclear', 'Family', 'Dream'],
   'Technology': ['Tech', 'Board', 'Battery', 'Facebook', 'Fortnite', 'Russia', 'Collision', 'Zuckerberg'],
-  'Rock Music': ['Rock', 'Platinum', 'Feedback', 'Guitar', 'Overdose', 'Bus', 'Poppers', 'Kayne'],
-  'Star Wars': ['Saber', 'Force', 'Blaster', 'Jedi', 'Speeder', 'Space', 'Emperor', 'Projection'],
-  'RWBY': ['Anime', 'Rose', 'Grim', 'Dust', 'Juniper', 'Remnant', 'Cardinal', 'Haven'],
-  'Jurassic Park': ['Dinosaur', 'Life', 'Amber', 'DNA', 'Jeep', 'UNIX', 'Grant', 'Kingdom'],
+  //'Rock Music': ['Rock', 'Platinum', 'Feedback', 'Guitar', 'Overdose', 'Bus', 'Poppers', 'Kayne'],
+  //'RWBY': ['Anime', 'Rose', 'Grim', 'Dust', 'Juniper', 'Remnant', 'Cardinal', 'Haven'],
+  //'Jurassic Park': ['Dinosaur', 'Life', 'Amber', 'DNA', 'Jeep', 'UNIX', 'Grant', 'Kingdom'],
   'Summer': ['Beach', 'Picnic', 'Camp', 'Sunshine', 'Hot', 'Jam', 'Sweat', 'BBQ'],
-  'Robin Williams': ['Robin', 'Popeye', 'Nanny', 'Genie', 'Alien', 'Android', 'Museum', 'AI'],
-  'Call Of Duty': ['Black', 'Tactics', 'Attachement', 'Confirmed', 'Ops', 'Dew', 'Scope', 'Killstreak'],
-  'Mark Wahlberg': ['Funky', 'Vibration', 'Boston', 'Happening', 'Star', 'Burgers', 'Transformers', 'Felony'],
-  'Skype': ['Call', 'Freemium', 'Ebay', 'Microsoft', 'Surveillance', 'Moji', 'Joel', 'Protocol'],
-  'Google': ['Search', 'Drive', 'News', 'Page', 'Alphabet', 'Plus', 'YouTube', 'Android']
+  //'Robin Williams': ['Robin', 'Popeye', 'Nanny', 'Genie', 'Alien', 'Android', 'Museum', 'AI'],
+  //'Call Of Duty': ['Black', 'Tactics', 'Attachement', 'Confirmed', 'Ops', 'Dew', 'Scope', 'Killstreak'],
+  //'Mark Wahlberg': ['Funky', 'Vibration', 'Boston', 'Happening', 'Star', 'Burgers', 'Transformers', 'Felony'],
+  //'Skype': ['Call', 'Freemium', 'Ebay', 'Microsoft', 'Surveillance', 'Moji', 'Joel', 'Protocol'],
+  'Biology': ['Foot', 'Hand', 'Leg', 'Arm', 'Body'],
+  'Maths': ['Integrate', 'Range', 'Average', 'Maximum'],
+  'Chemistry': ['Atom', 'Radioactive', 'Bond'],
+  'Physics': ['Momentum', 'Gravity', 'Power'],
+  'Languages': ['German', 'French', 'Spanish'],
+  'Economics': ['Currency', 'Profit', 'Loss'],
+  'Politics': ['Brexit', 'Prime Minister'],
+  'Google': ['Search', 'Drive', 'News', 'Page', 'Alphabet', 'Plus', 'YouTube', 'Android'],
+  'Star Wars': ['Saber', 'Force', 'Blaster', 'Jedi', 'Speeder', 'Space', 'Emperor', 'Projection'],
 };
 
 class Line {
@@ -41,6 +51,10 @@ class Line {
     this.color  = color;
   }
 }
+
+FirebaseApp firebaseApp;
+DatabaseReference firebaseDB;
+FirebaseUser user;
 
 List<Line> globalLines = [];
 

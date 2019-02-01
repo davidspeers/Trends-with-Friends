@@ -29,8 +29,8 @@ class _AboutPageState extends State<AboutPage> {
 
     Map<String,String> headingsToContent = {
       'How to Play':
-        "• Trends With Friends is a game inspired by the Google Trends Show web series.\n"
-        "• Each game consists of multiple rounds.\n"
+        //"•  inspired by the Google Trends Show web series.\n"
+        "• Trends With Friends is a game that consists of multiple rounds.\n"
         "• In each round you will be given a word, you will then need to think of a word that people google with the given word.\n"
         "• Your word and the given word will then be combined to become your query.\n"
         "• Google Trends will then calculate a score for all the queries in that round.\n"

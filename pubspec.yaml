@@ -9,8 +9,10 @@ dependencies:
   flutter_launcher_icons: 0.6.1
   charts_flutter: 0.4.0
   url_launcher: 3.0.3
-  google_sign_in: 3.0.5 #required for firebase_auth, newer version not supported by firebase_auth
-  firebase_auth: 0.5.20
+  google_sign_in: 3.2.4 #required for firebase_auth, newer version not supported by firebase_auth
+  firebase_auth: 0.6.5
+  firebase_database: 1.0.5
+  firebase_core: 0.2.5+1 #required for firebase_database - helps setting up database
 
 
 
@@ -50,6 +52,8 @@ flutter:
   assets:
     - assets/csv/most-common-nouns-english.csv
     - assets/images/TrendsWithFriendsLogo.png
+    - assets/images/GoogleLogo.png
+    - assets/images/MailLogo.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.io/assets-and-images/#resolution-aware.

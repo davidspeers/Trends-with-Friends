@@ -148,7 +148,7 @@ class _FinalScorePageState extends State<FinalScorePage> {
           return new Center(
             child: new Container(
               child: new Text(
-                getWinners(globals.totals),
+                (widget.mode == 'Online Mode') ? getWinners(widget.scores) : getWinners(globals.totals),
                 textAlign: TextAlign.center,
                 style: blackTextBold
               ),
@@ -157,7 +157,7 @@ class _FinalScorePageState extends State<FinalScorePage> {
             ),
           );
         }),
-        backgroundColor: getWinningColor(globals.totals),
+        backgroundColor: (widget.mode == 'Online Mode') ? getWinningColor(widget.scores) : getWinningColor(globals.totals),
       ),
     );
   }
@@ -188,6 +188,15 @@ class _FinalScorePageState extends State<FinalScorePage> {
         else {
           if (winningIndex[0]==0) winners = "Congratulations\nYou Won";
           else winners = "You Lost\nTry Again";
+        }
+        break;
+      }
+
+      case ("Online Mode"): {
+        if (winningIndex.length>1) winners = "You Drew Your Opponent";
+        else {
+          if (winningIndex[0]==0) winners = "Congratulations\nYou Won";
+          else winners = "You Lost\nBetter Luck Next Time";
         }
         break;
       }

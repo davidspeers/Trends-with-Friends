@@ -68,7 +68,7 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
       appBar: new AppBar(
         title: Text(widget.title),
         backgroundColor: Colors.blue,
-        actions: <Widget>[
+        actions: (widget.mode != 'Online Mode') ? <Widget>[
           IconButton(
             icon: Icon(Icons.timer),
             onPressed: () {
@@ -103,7 +103,7 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
               );
             },
           )
-        ],
+        ] : null,
       ),
       body: new Builder(builder: (BuildContext context) {
         return new GlowingOverscrollIndicator(
@@ -120,7 +120,9 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
     List<Widget> slivers = new List<Widget>();
 
     slivers.addAll(_buildGrids(context, 0, 1, myLists)); //1 list starting at index 0
-    slivers.addAll(_buildLists(context, 1, 2, myLists)); //2 lists starting at index 1
+    if (widget.mode != 'Online Mode') {
+      slivers.addAll(_buildLists(context, 1, 2, myLists)); //2 lists starting at index 1
+    }
     return slivers;
   }
 
@@ -195,227 +197,237 @@ class _ThemeSelectPageState extends State<ThemeSelectPage> {
     return topics;
   }
 
-  void _pushGame(int headingIndex, int index, String mode, var alertChoice) {
-    //Reset Globals
-    globals.termIndex = 0;
-    if (mode == "Party Mode") {
-      switch (alertChoice) {
-        case 2: globals.totals = [0, 0]; break;
-        case 3: globals.totals = [0, 0, 0]; break;
-        case 4: globals.totals = [0, 0, 0, 0]; break;
-        case 5: globals.totals = [0, 0, 0, 0, 0]; break;
-      }
+  void _pushGame([int headingIndex, int index, String mode, var alertChoice]) {
+    if (mode == 'Online Mode') {
+      //Just need to send the values to Firebase and have it handle things.
+      globals.firebaseDB.child(widget.roomName).update({
+        myLists[headingIndex][index] : globals.myThemesMap[myLists[headingIndex][index]]
+      });
+      /*Navigator.of(context).push(
+          new OnlineGameRoute(widget.teamName, widget.roomName)
+      );*/
     } else {
-      globals.totals = [0, 0];
-    }
-    switch (headings[headingIndex]) {
-      case "Show Themes": {
-        globals.isShowTheme = true;
-        globals.isRandomTheme = false;
-        globals.isCustomTheme = false;
-        globals.chosenThemeName = myLists[headingIndex][index];
-        if (globals.timerSetting == 0) {
-          Navigator.of(context).push(
-              new QueryPageRoute(
-                  title: myLists[headingIndex][index],
-                  terms: globals.myThemesMap[myLists[headingIndex][index]],
-                  mode: mode,
-                  alertChoice: alertChoice
-              )
-          );
-        } else {
-          Navigator.of(context).push(
-              new TimerPageRoute(
-                  title: myLists[headingIndex][index],
-                  terms: globals.myThemesMap[myLists[headingIndex][index]],
-                  mode: mode,
-                  alertChoice: alertChoice
-              )
-          );
+      //Reset Globals
+      globals.termIndex = 0;
+      if (mode == "Party Mode") {
+        switch (alertChoice) {
+          case 2: globals.totals = [0, 0]; break;
+          case 3: globals.totals = [0, 0, 0]; break;
+          case 4: globals.totals = [0, 0, 0, 0]; break;
+          case 5: globals.totals = [0, 0, 0, 0, 0]; break;
         }
-        break;
+      } else {
+        globals.totals = [0, 0];
       }
-      case "Random Themes": {
-        globals.isShowTheme = false;
-        globals.isRandomTheme = true;
-        globals.isCustomTheme = false;
-        globals.chosenThemeName = myLists[headingIndex][index];
-        //Note the importance of not calling the getRandomWords function inside
-        //the Navigator.of because it is called every time the keyboard appears and disappears
-        //(or device orientation etc.)
-        switch (myLists[headingIndex][index]) {
-          case 'Random Nouns': {
-            Future<List<String>> randomWords = getRandomWords();
-            if (globals.timerSetting == 0) {
-              Navigator.of(context).push(
+      switch (headings[headingIndex]) {
+        case "Show Themes": {
+          globals.isShowTheme = true;
+          globals.isRandomTheme = false;
+          globals.isCustomTheme = false;
+          globals.chosenThemeName = myLists[headingIndex][index];
+          if (globals.timerSetting == 0) {
+            Navigator.of(context).push(
                 new QueryPageRoute(
-                  title: myLists[headingIndex][index],
-                  futureTerms: randomWords,
-                  mode: mode, alertChoice:
-                alertChoice,
+                    title: myLists[headingIndex][index],
+                    terms: globals.myThemesMap[myLists[headingIndex][index]],
+                    mode: mode,
+                    alertChoice: alertChoice
                 )
-              );
-            } else {
-              Navigator.of(context).push(
+            );
+          } else {
+            Navigator.of(context).push(
                 new TimerPageRoute(
-                  title: myLists[headingIndex][index],
-                  futureTerms: randomWords,
-                  mode: mode, alertChoice:
-                alertChoice,
+                    title: myLists[headingIndex][index],
+                    terms: globals.myThemesMap[myLists[headingIndex][index]],
+                    mode: mode,
+                    alertChoice: alertChoice
                 )
-              );
-            }
-            break;
+            );
           }
-          case 'Random Show Theme': {
-            String randomTheme = randomKey(globals.myThemesMap);
-            if (globals.timerSetting == 0) {
-              Navigator.of(context).push(
-                new QueryPageRoute(
-                  title: randomTheme,
-                  terms: globals.myThemesMap[randomTheme],
-                  mode: mode,
-                  alertChoice: alertChoice,
-                )
-              );
-            } else {
-              Navigator.of(context).push(
-                new TimerPageRoute(
-                  title: randomTheme,
-                  terms: globals.myThemesMap[randomTheme],
-                  mode: mode,
-                  alertChoice: alertChoice,
-                )
-              );
-            }
-            break;
-          }
-          case 'Random Words From Show Themes': {
-            List<String> randomWords = [];
-            for (int i=0; i<8; i++) {
-              List<String> randomValues = randomValFromMap(globals.myThemesMap);
-              randomWords.add(randomValFromList(randomValues));
-            }
-            if (globals.timerSetting == 0) {
-              Navigator.of(context).push(
-                new QueryPageRoute(
-                  title: 'Random Show Words',
-                  terms: randomWords,
-                  mode: mode,
-                  alertChoice: alertChoice,
-                )
-              );
-            } else {
-              Navigator.of(context).push(
-                new TimerPageRoute(
-                  title: 'Random Show Words',
-                  terms: randomWords,
-                  mode: mode,
-                  alertChoice: alertChoice,
-                )
-              );
-            }
-            break;
-          }
-          case 'Random Custom Theme': {
-            if (customThemesMap.isNotEmpty) {
-              String randomTheme = randomKey(customThemesMap);
+          break;
+        }
+        case "Random Themes": {
+          globals.isShowTheme = false;
+          globals.isRandomTheme = true;
+          globals.isCustomTheme = false;
+          globals.chosenThemeName = myLists[headingIndex][index];
+          //Note the importance of not calling the getRandomWords function inside
+          //the Navigator.of because it is called every time the keyboard appears and disappears
+          //(or device orientation etc.)
+          switch (myLists[headingIndex][index]) {
+            case 'Random Nouns': {
+              Future<List<String>> randomWords = getRandomWords();
               if (globals.timerSetting == 0) {
                 Navigator.of(context).push(
-                  new QueryPageRoute(
-                    title: randomTheme,
-                    terms: customThemesMap[randomTheme],
-                    mode: mode,
-                    alertChoice: alertChoice,
-                  )
+                    new QueryPageRoute(
+                      title: myLists[headingIndex][index],
+                      futureTerms: randomWords,
+                      mode: mode, alertChoice:
+                    alertChoice,
+                    )
                 );
               } else {
                 Navigator.of(context).push(
-                  new TimerPageRoute(
-                    title: randomTheme,
-                    terms: customThemesMap[randomTheme],
-                    mode: mode,
-                    alertChoice: alertChoice,
-                  )
+                    new TimerPageRoute(
+                      title: myLists[headingIndex][index],
+                      futureTerms: randomWords,
+                      mode: mode, alertChoice:
+                    alertChoice,
+                    )
                 );
               }
-            } else {
-              Fluttertoast.showToast(
-                msg: "No Custom Themes Available",
-                toastLength: Toast.LENGTH_SHORT,
-                gravity: ToastGravity.BOTTOM,
-                timeInSecForIos: 1,
-              );
+              break;
             }
-            break;
-          }
-          case 'Random Words From Custom Themes': {
-            if (customThemesMap.isNotEmpty) {
+            case 'Random Show Theme': {
+              String randomTheme = randomKey(globals.myThemesMap);
+              if (globals.timerSetting == 0) {
+                Navigator.of(context).push(
+                    new QueryPageRoute(
+                      title: randomTheme,
+                      terms: globals.myThemesMap[randomTheme],
+                      mode: mode,
+                      alertChoice: alertChoice,
+                    )
+                );
+              } else {
+                Navigator.of(context).push(
+                    new TimerPageRoute(
+                      title: randomTheme,
+                      terms: globals.myThemesMap[randomTheme],
+                      mode: mode,
+                      alertChoice: alertChoice,
+                    )
+                );
+              }
+              break;
+            }
+            case 'Random Words From Show Themes': {
               List<String> randomWords = [];
-              for (int i = 0; i < 8; i++) {
-                List<String> randomValues = randomValFromMap(customThemesMap);
+              for (int i=0; i<8; i++) {
+                List<String> randomValues = randomValFromMap(globals.myThemesMap);
                 randomWords.add(randomValFromList(randomValues));
               }
               if (globals.timerSetting == 0) {
                 Navigator.of(context).push(
-                  new QueryPageRoute(
-                    title: 'Random Custom Words',
-                    terms: randomWords,
-                    mode: mode,
-                    alertChoice: alertChoice,
-                  )
+                    new QueryPageRoute(
+                      title: 'Random Show Words',
+                      terms: randomWords,
+                      mode: mode,
+                      alertChoice: alertChoice,
+                    )
                 );
               } else {
                 Navigator.of(context).push(
-                  new TimerPageRoute(
-                    title: 'Random Custom Words',
-                    terms: randomWords,
-                    mode: mode,
-                    alertChoice: alertChoice,
-                  )
+                    new TimerPageRoute(
+                      title: 'Random Show Words',
+                      terms: randomWords,
+                      mode: mode,
+                      alertChoice: alertChoice,
+                    )
                 );
               }
-            } else {
-              Fluttertoast.showToast(
-                msg: "No Custom Themes Available",
-                toastLength: Toast.LENGTH_SHORT,
-                gravity: ToastGravity.BOTTOM,
-                timeInSecForIos: 1,
-              );
+              break;
             }
-            break;
+            case 'Random Custom Theme': {
+              if (customThemesMap.isNotEmpty) {
+                String randomTheme = randomKey(customThemesMap);
+                if (globals.timerSetting == 0) {
+                  Navigator.of(context).push(
+                      new QueryPageRoute(
+                        title: randomTheme,
+                        terms: customThemesMap[randomTheme],
+                        mode: mode,
+                        alertChoice: alertChoice,
+                      )
+                  );
+                } else {
+                  Navigator.of(context).push(
+                      new TimerPageRoute(
+                        title: randomTheme,
+                        terms: customThemesMap[randomTheme],
+                        mode: mode,
+                        alertChoice: alertChoice,
+                      )
+                  );
+                }
+              } else {
+                Fluttertoast.showToast(
+                  msg: "No Custom Themes Available",
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIos: 1,
+                );
+              }
+              break;
+            }
+            case 'Random Words From Custom Themes': {
+              if (customThemesMap.isNotEmpty) {
+                List<String> randomWords = [];
+                for (int i = 0; i < 8; i++) {
+                  List<String> randomValues = randomValFromMap(customThemesMap);
+                  randomWords.add(randomValFromList(randomValues));
+                }
+                if (globals.timerSetting == 0) {
+                  Navigator.of(context).push(
+                      new QueryPageRoute(
+                        title: 'Random Custom Words',
+                        terms: randomWords,
+                        mode: mode,
+                        alertChoice: alertChoice,
+                      )
+                  );
+                } else {
+                  Navigator.of(context).push(
+                      new TimerPageRoute(
+                        title: 'Random Custom Words',
+                        terms: randomWords,
+                        mode: mode,
+                        alertChoice: alertChoice,
+                      )
+                  );
+                }
+              } else {
+                Fluttertoast.showToast(
+                  msg: "No Custom Themes Available",
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIos: 1,
+                );
+              }
+              break;
+            }
           }
+          break;
         }
-        break;
-      }
-      case "Custom Themes": {
-        globals.isShowTheme = false;
-        globals.isRandomTheme = false;
-        globals.isCustomTheme = true;
-        globals.chosenThemeName = myLists[headingIndex][index];
-        if (globals.timerSetting == 0) {
-          Navigator.of(context).push(
-            new QueryPageRoute(
-              title: myLists[headingIndex][index],
-              terms: customThemesMap[myLists[headingIndex][index]],
-              mode: mode,
-              alertChoice: alertChoice
-            )
-          );
-        } else {
-          Navigator.of(context).push(
-            new TimerPageRoute(
-              title: myLists[headingIndex][index],
-              terms: customThemesMap[myLists[headingIndex][index]],
-              mode: mode,
-              alertChoice: alertChoice
-            )
-          );
+        case "Custom Themes": {
+          globals.isShowTheme = false;
+          globals.isRandomTheme = false;
+          globals.isCustomTheme = true;
+          globals.chosenThemeName = myLists[headingIndex][index];
+          if (globals.timerSetting == 0) {
+            Navigator.of(context).push(
+                new QueryPageRoute(
+                    title: myLists[headingIndex][index],
+                    terms: customThemesMap[myLists[headingIndex][index]],
+                    mode: mode,
+                    alertChoice: alertChoice
+                )
+            );
+          } else {
+            Navigator.of(context).push(
+                new TimerPageRoute(
+                    title: myLists[headingIndex][index],
+                    terms: customThemesMap[myLists[headingIndex][index]],
+                    mode: mode,
+                    alertChoice: alertChoice
+                )
+            );
+          }
+          break;
         }
-        break;
-      }
-      default: {
-        print("Heading Error - the heading was incorrect (${headings[headingIndex]}) ");
+        default: {
+          print("Heading Error - the heading was incorrect (${headings[headingIndex]}) ");
+        }
       }
     }
   }

@@ -445,7 +445,7 @@ class AnimatedHomeState extends State<AnimatedHome> with TickerProviderStateMixi
         child: new Image.asset('assets/images/TrendsWithFriendsLogo.png', height: 50.0,),
       )*/
       new Expanded(child: Container()),
-      new Padding(
+      /*new Padding(
         padding: EdgeInsets.all(8.0),
         child: new Card(
           color: cardColor,
@@ -487,15 +487,15 @@ class AnimatedHomeState extends State<AnimatedHome> with TickerProviderStateMixi
             ],
           ),
         ),
-      ),
+      ),*/
       new Padding(
           padding: EdgeInsets.all(8.0),
           child: stackedButton(mode: "Party Mode")
       ),
-      new Padding(
+      /*new Padding(
           padding: EdgeInsets.all(8.0),
           child: stackedButton(mode: "CPU Mode")
-      ),
+      ),*/
       new Expanded(child: Container()),
       new Row(
         children: <Widget>[

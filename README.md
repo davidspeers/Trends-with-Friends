@@ -1,8 +1,10 @@
-# gtrends_app
+# Trends with Friends
 
-Google Trends Game
+Flutter version of Trends with Friends.
+Download the app on the Google Play Store (https://play.google.com/store/apps/details?id=com.dachsteam.trendswithfriends)
 
-## Getting Started
+Developed in order to compare Flutter and Kotlin for Android Development for my University Honours Project.
 
-For help getting started with Flutter, view our online
-[documentation](https://flutter.io/).
+Read my findings here: https://github.com/davidspeers/gtrends_app/blob/master/Honours_Project.pdf
+
+
